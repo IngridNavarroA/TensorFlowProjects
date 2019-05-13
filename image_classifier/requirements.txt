@@ -1,0 +1,18 @@
+
+# List of required modules for image classifier
+scipy
+matplotlib
+scikit-image
+scikit-learn
+ipython
+easydict==1.6
+joblib==0.10.3
+numpy==1.16.0
+Pillow==4.0.0
+tensorflow-gpu==1.12
+#tensorflow==1.0.0
+
+# ROS
+PyYAML
+rospkg
+catkin_pkg
