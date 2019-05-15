@@ -4,13 +4,13 @@ class Color:
     FAIL  = '\033[91m'
     DONE  = '\033[0m'
 
-def info_msg(msg: str):
+def info_msg(msg):
 	print(Color.GREEN+"[INFO] "+msg+Color.DONE)
 
-def err_msg(msg: str):
-	print(Color.RED+"[ERROR] "+msg)
+def err_msg(msg):
+	print(Color.FAIL+"[ERROR] "+msg)
 	print("Killing program."+Color.DONE)
 	exit()
 
-def done_msg():
-	print(Color.BLUE+"[LISTO]"+Color.DONE)
+def done_msg(msg=''):
+	print(Color.BLUE+"[DONE] "+msg+Color.DONE)

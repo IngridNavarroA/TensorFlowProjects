@@ -1,3 +1,4 @@
 image_classifier/data
 image_classifier/pretrained
 image_classifier/src
+image_classifier/scripts/__pycache__
