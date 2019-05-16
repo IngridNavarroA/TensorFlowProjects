@@ -1,3 +1,9 @@
+"""
+	@author: Ingrid Navarro 
+	@date:   May 10th, 2019
+	@brief:  Dataset loading utils.
+"""
+
 import os
 import glob
 import cv2
@@ -28,14 +34,6 @@ class Dataset():
 	@property
 	def cls(self):
 		return self._cls
-	
-	@property
-	def epochs_done(self):
-		return self._epochs_done
-
-	@property
-	def idx_epoch(self):
-		return self._idx_epoch
 	
 	def next_batch(self, batch_size):
 		""" Gets next batch from dataset. """

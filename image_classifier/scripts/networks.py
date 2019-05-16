@@ -1,3 +1,9 @@
+"""
+	@author: Ingrid Navarro 
+	@date:   May 10th, 2019
+	@brief:  Network architectures.
+"""
+
 import layers as L
 import tensorflow as tf
 import numpy as np

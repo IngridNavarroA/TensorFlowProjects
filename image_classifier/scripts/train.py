@@ -1,8 +1,7 @@
 """
 	@author: Ingrid Navarro 
 	@date:   May 10th, 2019
-	@brief:  Algoritmo de entrenamiento para clasificacion de 
-			 defectos en pintura. 
+	@brief:  Training an image classifier. 
 """
 from utils import info_msg, err_msg, done_msg
 from networks import Alexnet 
@@ -17,10 +16,10 @@ np.random.seed(1)
 tf.set_random_seed(2)
 
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('data_path', './data/cat-dogs/training_data/', """Path to training images.""")
-tf.app.flags.DEFINE_string('model_path', 'model/', """Path to checkpoints.""")
-tf.app.flags.DEFINE_string('log_path', 'logs/', """Path to log training. """)
-tf.app.flags.DEFINE_string('network', 'alexnet', """Networks available [alexnet].""")
+tf.app.flags.DEFINE_string('data', './data/cat-dogs/training_data/', """Path to training images.""")
+tf.app.flags.DEFINE_string('model', 'model/', """Path to checkpoints.""")
+tf.app.flags.DEFINE_string('log', 'logs/', """Path to log training. """)
+tf.app.flags.DEFINE_string('net', 'alexnet', """Networks available [alexnet].""")
 
 tf.app.flags.DEFINE_integer('max_iter', 3000, """Max number of iterations for training. """)
 tf.app.flags.DEFINE_integer('finetune', 0, """Finetune or train end-to-end [1 / 0].""")
@@ -41,10 +40,10 @@ def train():
 
 	try:
 		info_msg("Loading training configuration...")
-		cfg = config.base_config(FLAGS.data_path)
+		cfg = config.base_config(FLAGS.data)
 		done_msg() 
 	except:
-		err_msg("Could not load configuration. Is your data path: {} ?".format(FLAGS.data_path))
+		err_msg("Could not load configuration. Is your data path: {} ?".format(FLAGS.data))
 
 	try:
 		info_msg("Loading training images...")
@@ -64,7 +63,7 @@ def train():
 
 	trainable = False if FLAGS.finetune else True
 
-	info_msg("Loading architecture {}...".format(FLAGS.network))
+	info_msg("Loading architecture {}...".format(FLAGS.net))
 	network = Alexnet(cfg.NUM_CLS)
 	out = network.load_net(x, trainable)
 	y_pred = tf.nn.softmax(out, name='y_pred')
@@ -80,7 +79,7 @@ def train():
 	if FLAGS.finetune and not FLAGS.restore:
 		""" Finetuning """
 		info_msg("Finetuning {} network layers {} ..."
-			.format(FLAGS.network, cfg.TRAIN_LAYERS))
+			.format(FLAGS.net, cfg.TRAIN_LAYERS))
 		network.load_weights(cfg.WEIGHTS_ALEXNET, cfg.TRAIN_LAYERS, sess)
 		done_msg()
 	elif FLAGS.restore:
@@ -116,8 +115,8 @@ def train():
 		accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 		tf.summary.scalar('accuracy', accuracy)
 
-	train_writer = tf.summary.FileWriter(FLAGS.log_path + 'train', sess.graph)
-	val_writer = tf.summary.FileWriter(FLAGS.log_path + 'val', sess.graph)
+	train_writer = tf.summary.FileWriter(FLAGS.log + 'train', sess.graph)
+	val_writer = tf.summary.FileWriter(FLAGS.log + 'val', sess.graph)
 	merge = tf.summary.merge_all()
 	sess.run(tf.global_variables_initializer())
 
@@ -154,19 +153,19 @@ def train():
 			done_msg(msg.format(epoch+1, train_acc, train_loss, val_acc, val_loss, t.time()-start))
 			start = t.time()
 
-			saver.save(sess, FLAGS.model_path+'model-epoch-{}'.format(epoch))
+			saver.save(sess, FLAGS.model+'model-epoch-{}'.format(epoch))
 
 	done_msg("Finished training.")
 
 def main(argv=None):
 	if FLAGS.restore == 0:
-		if tf.gfile.Exists(FLAGS.log_path):
-			tf.gfile.DeleteRecursively(FLAGS.log_path)
-			tf.gfile.MakeDirs(FLAGS.log_path)
+		if tf.gfile.Exists(FLAGS.log):
+			tf.gfile.DeleteRecursively(FLAGS.log)
+			tf.gfile.MakeDirs(FLAGS.log)
 
-		if tf.gfile.Exists(FLAGS.model_path):
-			tf.gfile.DeleteRecursively(FLAGS.model_path)
-			tf.gfile.MakeDirs(FLAGS.model_path)
+		if tf.gfile.Exists(FLAGS.model):
+			tf.gfile.DeleteRecursively(FLAGS.model)
+			tf.gfile.MakeDirs(FLAGS.model)
 	train()
 
 if __name__ == '__main__':

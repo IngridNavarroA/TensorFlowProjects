@@ -29,13 +29,12 @@ def base_config(data_path):
 
 	# Training config
 	config.NUM_EPOCHS = 10
-	config.BATCH_SIZE = 16
+	config.BATCH_SIZE = 32
 	config.VAL_SIZE   = 0.20  
 	config.KEEP_PROB  = 0.5
 
 	config.LEARNING_RATE = 1e-4
-	config.TRAIN_LAYERS  = ['fc8', 'fc7', 'fc6'] # to finetune 768x256
+	config.TRAIN_LAYERS  = ['fc8', 'fc7', 'fc6', 'conv5', 'conv4'] # to finetune 768x256
 	config.WEIGHTS_ALEXNET = 'pretrained/bvlc_alexnet.npy'
-	config.WEIGHTS_VGG16   = 'pretrained/vgg16_weights.npz'
 
 	return config
