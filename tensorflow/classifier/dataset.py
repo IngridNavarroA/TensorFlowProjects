@@ -1,9 +1,9 @@
 """
-	@author: Ingrid Navarro 
+	@author: IngridNavarroA
 	@date:   May 10th, 2019
-	@brief:  Dataset loading utils.
+	@brief:  Util to load input dataset, and create and split the data
+			 into training an validation sets. 
 """
-
 import os
 import glob
 import cv2

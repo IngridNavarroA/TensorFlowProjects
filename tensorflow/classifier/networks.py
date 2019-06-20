@@ -1,7 +1,8 @@
 """
 	@author: IngridNavarroA
 	@date:   June 11th, 2019
-	@brief:  Network architectures.
+	@brief:  Network architectures. Currently supports Alexnet and VGG16. 
+			 Resnet, Inception and SqueezeNet are work in progress. 
 """
 import layers as L
 import tensorflow as tf
@@ -160,3 +161,15 @@ class Inception():
 
 	def load_weights(self, weights_path, train_layer, sess):
 		pass 
+
+
+class SqueezeNet():
+	def __init__(self, nclasses, prob=0.5):
+		self.num_classes = nclasses
+		self.keep_prob = prob
+
+	def load_net(self, x, train):
+		pass
+
+	def load_weights(self):
+		pass

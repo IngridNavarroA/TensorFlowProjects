@@ -1,7 +1,7 @@
 """
 	@author: Ingrid Navarro 
-	@date:   May 10th, 2019
-	@brief:  Layer wrappers 
+	@date:   June 20th, 2019
+	@brief:  Layer wrappers to build the CNNs.
 """
 import tensorflow as tf
 
@@ -106,7 +106,9 @@ def dropout(x, keep_prob=0.5):
 	""" Wrapper for Dropout layer. """
 	return tf.nn.dropout(x, rate=1-keep_prob)
 
-
+""" --------------------------------------------------------------------
+							Inception Module
+    -------------------------------------------------------------------- """ 
 def inception(name, x, conv1_size, conv3_red_size, conv3_size, conv5_red_size, conv5_size, pool_proj_size):
 	""" Inception module. """
 	with tf.variable_scope(name) as scope:

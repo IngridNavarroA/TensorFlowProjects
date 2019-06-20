@@ -49,7 +49,7 @@ def train():
 	""" Training algorithm. """
 
 	# Assert correct parameters. 
-	assert FLAGS.net.lower() == 'alexnet' or FLAGS.net.lower() == 'inception' or FLAGS.net.lower() == 'vgg', \
+	assert FLAGS.net.lower() == 'alexnet' or FLAGS.net.lower() == 'vgg', \
 		err_msg("Network not supported.")
 
 	assert FLAGS.img_format.lower() == 'png' or FLAGS.img_format.lower() == 'jpg', \
@@ -64,7 +64,7 @@ def train():
 
 	try:
 		info_msg("Loading training configuration...")
-		cfg = config.base_config(FLAGS.data)
+		cfg = config.base_config(FLAGS.data, FLAGS.network)
 		done_msg() 
 	except:
 		err_msg("Could not load configuration. Is your data path: {} ?".format(FLAGS.data))
@@ -153,7 +153,7 @@ def train():
 
 			# Get current iteration from restored model 
 			curr_iter = get_current_iteration(int(checkpoint.split('-')[-1]), iter_batch)
-			curr_iter = 0 if curr_iter > int(cfg.RESTORE * FLAGS.max_iter) else curr_iter
+			curr_iter = 0 if curr_iter > int(cfg.RESTORE_THRESHOLD * FLAGS.max_iter) else curr_iter
 
 		except:
 			err_msg("Could not load checkpoint.")

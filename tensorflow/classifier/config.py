@@ -1,59 +1,78 @@
 """
-	@author: Ingrid Navarro
-	@date:   Dec 17th, 2018
-	@brief:  Network's base configuration
+	@author: IngridNavarroA
+	@date:   June 20th, 2019
+	@brief:  Network configuration. Supports Alexnet, VGG16, ResNet, Inception and SqueezeNet.
 """
 import os
 from easydict import EasyDict as edict
 
-def base_config(data_path):
-	""" Defines the parameters to train / test the convnet. 
-
+def base_config(data_path, network):
+	""" 
+		Defines the parameters to train / test the CNN. 
 		Parameters
 		----------
-			data_path : str
-				Path to the training data. 
+			data_path : str -> path to the training data. 
+			network   : str -> network to train.  
 	"""
 	config = edict()
 	
-	# Dataset 
 	config.DATA_PATH = data_path
-	config.CLASSES = os.listdir(config.DATA_PATH)
-	config.NUM_CLS = len(config.CLASSES)
-
-	# Image config
+	config.CLASSES   = os.listdir(config.DATA_PATH)
+	config.NUM_CLS   = len(config.CLASSES)
+	config.VAL_SIZE  = 0.20 
+	config.SCALE     = 1.0
 	config.NUM_CHANNELS = 3
-	config.SCALE 		= 1.0
-	config.IMG_WIDTH    = 768 # 128 # [128, 224, 256]
-	config.IMG_HEIGHT   = 256 # 128 # [128, 224, 256]
+	config.RESTORE_THRESHOLD = 0.90 
 
-	# Training config
-	config.NUM_EPOCHS = 10
-	config.BATCH_SIZE = 32
-	config.VAL_SIZE   = 0.20  
-	config.KEEP_PROB  = 0.20
-	config.RESTORE    = 0.90 
-	config.LEARNING_RATE = 1e-4
+	# Configuration specific to type of neural network. These are my preferred parameters.
+	if network == "alexnet":
+		config.KEEP_PROB     = 0.20 # dropout probability
+		config.BATCH_SIZE    = 32
+		config.LEARNING_RATE = 1e-4
+		config.IMG_WIDTH     = 256
+		config.IMG_HEIGHT    = 256
+		config.TRAIN_LAYERS  = ['fc8', 'fc7', 'fc6', 'conv5', 'conv4']
+		config.META_FILE     = './pretrained/alexnet/alexnet.meta'
+		config.WEIGHTS       = './pretrained/alexnet/alexnet.npy'
 
-	# Alexnet
-	config.ALEXNET = {
-		"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4', 'conv3', 'conv2', 'conv1'],
-		"meta_file"	   : './pretrained/alexnet/alexnet.meta',
-		"weights"	   : './pretrained/alexnet/alexnet.npy'
-	}
+	elif network == 'vgg':
+		config.KEEP_PROB     = 0.40 
+		config.BATCH_SIZE    = 32
+		config.LEARNING_RATE = 1e-4
+		config.IMG_WIDTH     = 128
+		config.IMG_HEIGHT    = 128
+		config.TRAIN_LAYERS  = ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1', 'conv4_3', 'conv4_2', 'conv4_1']
+		config.META_FILE     = './pretrained/vgg16/vgg16.meta'
+		config.WEIGHTS       = './pretrained/vgg16/vgg16_weights.npz'
 
-	# VGG16
-	config.VGG16 = {
-		"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1', 'conv4_3', 'conv4_2', 'conv4_1'],
-		"meta_file"    : './pretrained/vgg16/vgg16.meta',
-		"weights"	   : './pretrained/vgg16/vgg16_weights.npz'
-	}
-	
-	# Inception 
-	config.INCEPTION = {
-		"train_layers" : None, 
-		"meta_file"    : None,
-		"weights"	   : None
-	}
+	elif network == 'resnet':
+		config.KEEP_PROB     = None
+		config.BATCH_SIZE    = None
+		config.LEARNING_RATE = None
+		config.IMG_WIDTH     = None
+		config.IMG_HEIGHT    = None
+		config.TRAIN_LAYERS  = None
+		config.META_FILE     = None
+		config.WEIGHTS       = None
+
+	elif network == 'inception':
+		config.KEEP_PROB     = None
+		config.BATCH_SIZE    = None
+		config.LEARNING_RATE = None
+		config.IMG_WIDTH     = None
+		config.IMG_HEIGHT    = None
+		config.TRAIN_LAYERS  = None
+		config.META_FILE     = None
+		config.WEIGHTS       = None
+
+	elif network == 'squeezenet':
+		config.KEEP_PROB     = None
+		config.BATCH_SIZE    = None
+		config.LEARNING_RATE = None
+		config.IMG_WIDTH     = None
+		config.IMG_HEIGHT    = None
+		config.TRAIN_LAYERS  = None
+		config.META_FILE     = None
+		config.WEIGHTS       = None
 
 	return config
