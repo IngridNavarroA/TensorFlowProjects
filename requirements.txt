@@ -9,3 +9,4 @@ numpy==1.16.0
 Pillow==4.0.0
 tensorflow-gpu==1.13.1
 tqdm
+glob
