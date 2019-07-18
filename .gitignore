@@ -1,4 +1,4 @@
-tensorflow/logs
-tensorflow/pretrained
-tensorflow/model
-tensorflow/data
+logs
+pretrained
+model
+# data
