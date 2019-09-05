@@ -1,4 +1,4 @@
-# TensorFlow Image Classifier API 
+# TensorFlow Image Classification Wrapper 
 
 This is a simple image classifier API to train and test image classifier models. 
 
