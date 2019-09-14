@@ -1,6 +1,6 @@
 # TensorFlow Image Classification Wrapper 
 
-This is a simple image classifier API to train and test image classifier models. 
+This is a simple image classifier API to train and test image classification models. 
 
 Supported models:
 - AlexNet 
