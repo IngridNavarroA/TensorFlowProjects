@@ -1,59 +1,52 @@
 """
 	@author: Ingrid Navarro
 	@date:   Dec 17th, 2018
-	@brief:  Network's base configuration
+	@brief:  Network configuration
 """
 import os
-from easydict import EasyDict as edict
 
-def base_config(data_path):
-	""" Defines the parameters to train / test the convnet. 
+class Configuration():
+	def	__init__(self, data_path, stage, num_epochs, network):
 
-		Parameters
-		----------
-			data_path : str
-				Path to the training data. 
-	"""
-	config = edict()
-	
-	# Dataset 
-	config.DATA_PATH = data_path
-	config.CLASSES = os.listdir(config.DATA_PATH)
-	config.NUM_CLS = len(config.CLASSES)
+		self.data_path   = data_path
+		self.classes     = os.listdir(self.data_path)
+		self.num_classes = len(self.classes)
+		self.stage       = stage # defines if training or testing
 
-	# Image config
-	config.NUM_CHANNELS = 3
-	config.SCALE 		= 1.0
-	config.IMG_WIDTH    = 768 # 128 # [128, 224, 256]
-	config.IMG_HEIGHT   = 256 # 128 # [128, 224, 256]
+		# Image configuration
+		self.img_scale  = 1.0
+		self.img_depth  = 3
+		self.img_width  = 256
+		self.img_height = 256
 
-	# Training config
-	config.NUM_EPOCHS = 10
-	config.BATCH_SIZE = 32
-	config.VAL_SIZE   = 0.20  
-	config.KEEP_PROB  = 0.20
-	config.RESTORE    = 0.90 
-	config.LEARNING_RATE = 1e-4
+		# Training configuration 
+		self.split_size = 0.15
+		self.batch_size = 32
+		self.dropout_rate = 0.5
+		
+		self.adam_momentum = 0.5
+		self.num_epochs = num_epochs
+		self.save_each_n = 20
+		self.restore = 0.90
 
-	# Alexnet
-	config.ALEXNET = {
-		"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4', 'conv3', 'conv2', 'conv1'],
-		"meta_file"	   : './pretrained/alexnet/alexnet.meta',
-		"weights"	   : './pretrained/alexnet/alexnet.npy'
-	}
+		if network == "alexnet":
+			self.learning_rate = 1e-4
+			self.net_dict = {
+				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4', 'conv3', 'conv2', 'conv1'],
+				"meta_file"	   : './pretrained/alexnet/alexnet.meta',
+				"weights"	     : './pretrained/alexnet/alexnet.npy'
+			}
+		elif network == "vgg":
+			self.learning_rate = 1e-4
+			self.net_dict = {
+				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1', 'conv4_3', 'conv4_2', 'conv4_1'],
+				"meta_file"    : './pretrained/vgg16/vgg16.meta',
+				"weights"	     : './pretrained/vgg16/vgg16_weights.npz'
+			}
 
-	# VGG16
-	config.VGG16 = {
-		"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1', 'conv4_3', 'conv4_2', 'conv4_1'],
-		"meta_file"    : './pretrained/vgg16/vgg16.meta',
-		"weights"	   : './pretrained/vgg16/vgg16_weights.npz'
-	}
-	
-	# Inception 
-	config.INCEPTION = {
-		"train_layers" : None, 
-		"meta_file"    : None,
-		"weights"	   : None
-	}
-
-	return config
+		elif network == "resnet":
+			pass
+		elif network == "inception":
+			pass
+		elif network == "squeezenet":
+			pass
