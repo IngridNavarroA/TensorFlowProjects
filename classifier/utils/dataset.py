@@ -51,16 +51,16 @@ def load(cfg, frmt):
 	""" Loads and normalizes dataset from specified path. """
 	def normalize(f):
 		img = cv2.imread(f)
-		img = cv2.resize(img, (cfg.IMG_WIDTH, cfg.IMG_HEIGHT), 0, 0, cv2.INTER_LINEAR)
+		img = cv2.resize(img, (cfg.img_width, cfg.img_height), 0, 0, cv2.INTER_LINEAR)
 		img = img.astype(np.float32)
 		return np.multiply(img, 1.0 / 255.0)
 
 	# Get dataset 
 	images, labels, classes = [], [], []
 
-	for lbl, clss in enumerate(cfg.CLASSES):
+	for lbl, clss in enumerate(cfg.classes):
 		
-		path = os.path.join(cfg.DATA_PATH, clss, '*.{}'.format(frmt))
+		path = os.path.join(cfg.data_path, clss, '*.{}'.format(frmt))
 		files = glob.glob(path)
 
 		print("\t[DATA] Reading class {} (index: {}) from: {}".format(clss, lbl, path))
@@ -68,7 +68,7 @@ def load(cfg, frmt):
 			image = normalize(file)
 			images.append(image)
 
-			label = np.zeros(len(cfg.CLASSES))
+			label = np.zeros(cfg.num_classes)
 			label[lbl] = 1.0
 			labels.append(label)
 
@@ -77,7 +77,7 @@ def load(cfg, frmt):
 
 	images, labels, classes = shuffle(np.array(images), np.array(labels), np.array(classes))
 
-	val_size = int(cfg.VAL_SIZE * images.shape[0])
+	val_size = int(cfg.split_size * images.shape[0])
 
 	# Split dataset
 	vimages = images[:val_size]

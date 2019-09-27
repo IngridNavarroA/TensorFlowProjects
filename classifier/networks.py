@@ -46,7 +46,7 @@ class Alexnet():
 				continue
 
 			# Load pre-trained weights on layers that won't be trained
-			with tf.variable_scope(layer, reuse=True):
+			with tf.compat.v1.variable_scope(layer, reuse=True):
 				print("\t[FINETUNE] Loading parameters for layer {}".format(layer))
 				for data in weights[layer]:
 					if len(data.shape) == 1:

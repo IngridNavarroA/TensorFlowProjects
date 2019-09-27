@@ -11,18 +11,18 @@ def variable_summary(var):
 	
 	with tf.name_scope('summaries'):
 		mean = tf.reduce_mean(var)
-		tf.summary.scalar('mean', mean)
+		tf.compat.v1.summary.scalar('mean', mean)
 		
 		with tf.name_scope('stddev'):
 			stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
 		
 		# Visualizing gradient  
-		tf.summary.scalar('stddev', stddev)
-		tf.summary.scalar('max', tf.reduce_max(var))
-		tf.summary.scalar('min', tf.reduce_min(var))
+		tf.compat.v1.summary.scalar('stddev', stddev)
+		tf.compat.v1.summary.scalar('max', tf.reduce_max(var))
+		tf.compat.v1.summary.scalar('min', tf.reduce_min(var))
 		
 		# Visualizing activation distribution
-		tf.summary.histogram('histogram', var)
+		tf.compat.v1.summary.histogram('histogram', var)
 
 def conv(name, x, fsize, nfilters, stride=1, padding='SAME', groups=1, stddev=0.05, binit_val=0.05):
 	""" Wrapper for Convolutional layer. """
@@ -31,15 +31,15 @@ def conv(name, x, fsize, nfilters, stride=1, padding='SAME', groups=1, stddev=0.
 	convolve = lambda i, w: tf.nn.conv2d(i, w, 
 		strides=[1, stride, stride, 1], padding=padding)
 
-	with tf.variable_scope(name) as scope:
+	with tf.compat.v1.variable_scope(name) as scope:
 
 		# Create random weights 
-		w_init = tf.truncated_normal(shape=[fsize, fsize, ninputs, nfilters], stddev=stddev, dtype=tf.float32)
-		w = tf.get_variable('weights', initializer=w_init, dtype=tf.float32)
+		w_init = tf.random.truncated_normal(shape=[fsize, fsize, ninputs, nfilters], stddev=stddev, dtype=tf.float32)
+		w = tf.compat.v1.get_variable('weights', initializer=w_init, dtype=tf.float32)
 
 		# Initialize biases 
 		b_init = tf.constant(binit_val, shape=[nfilters], dtype=tf.float32)
-		b = tf.get_variable('biases', initializer=b_init, dtype=tf.float32)
+		b = tf.compat.v1.get_variable('biases', initializer=b_init, dtype=tf.float32)
 
 		# Convolution 
 		if groups == 1:
@@ -63,8 +63,8 @@ def lrn(x, radius, alpha, beta, bias=1.0):
 
 def maxpool(name, x, fsize=3, stride=2, padding='SAME'):
 	""" Wrapper for Pooling layer. """
-	with tf.variable_scope(name):
-		layer = tf.nn.max_pool(value=x, ksize=[1, fsize, fsize, 1], 
+	with tf.compat.v1.variable_scope(name):
+		layer = tf.compat.v1.nn.max_pool(value=x, ksize=[1, fsize, fsize, 1], 
 			strides=[1, stride, stride, 1], padding=padding)       
 		
 		variable_summary(layer)
@@ -86,16 +86,16 @@ def fc(name, x, noutputs, relu=True, stddev=0.05, binit_val=0.05):
 	layer_shape = x.get_shape()
 	ninputs = layer_shape[1:].num_elements()
 
-	with tf.variable_scope(name) as scope:
+	with tf.compat.v1.variable_scope(name) as scope:
 		# Create random weights
-		w_init = tf.truncated_normal(shape=[ninputs, noutputs], stddev=stddev, dtype=tf.float32)
-		w = tf.get_variable('weights', initializer=w_init, dtype=tf.float32)
+		w_init = tf.random.truncated_normal(shape=[ninputs, noutputs], stddev=stddev, dtype=tf.float32)
+		w = tf.compat.v1.get_variable('weights', initializer=w_init, dtype=tf.float32)
 
 		# Initialize bias 
 		b_init = tf.constant(binit_val, shape=[noutputs], dtype=tf.float32)
-		b = tf.get_variable('biases', initializer=b_init, dtype=tf.float32)
+		b = tf.compat.v1.get_variable('biases', initializer=b_init, dtype=tf.float32)
 
-		layer = tf.nn.xw_plus_b(x, w, b, name=scope.name)
+		layer = tf.compat.v1.nn.xw_plus_b(x, w, b, name=scope.name)
 
 		if relu:
 			layer = tf.nn.relu(layer)
@@ -109,7 +109,7 @@ def dropout(x, keep_prob=0.5):
 
 def inception(name, x, conv1_size, conv3_red_size, conv3_size, conv5_red_size, conv5_size, pool_proj_size):
 	""" Inception module. """
-	with tf.variable_scope(name) as scope:
+	with tf.compat.v1.variable_scope(name) as scope:
 		
 		print("\n\t[MODULE] {}".format(name))
 		conv1 = conv('{}_1x1'.format(name), x=x, fsize=1, nfilters=conv1_size)
