@@ -1,4 +1,4 @@
-# TensorFlow Image Classification Wrapper 
+# Tensorflow - Image Classification Wrapper
 
 This is a simple image classifier API to train and test image classification models. 
 
@@ -9,25 +9,18 @@ Supported models:
 - ResNet (In progress)
 - SqueezeNet (In progress)
 
-You can also implement your own model using the layer wrappers, and add more wrappers as you need them. 
+You can also implement your own model using the layer and module wrappers, and add more wrappers as you need them. 
 
-The API allows to perform end-to-end training, finetuning and restoring a training process. I am implementing a GUI to test images on trained models. In the meantime, use the test.py if you want to test a given model.
+The API allows to perform end-to-end training, fine-tuning and restoring a training process. To test the model use the test.py
 
 ## Requirements and installation
 
 This code has been implemented / tested / maintained with:
-- OpenCV == 3.4
+- OpenCV >= 3.4
 - Python3 
 - Tensorflow == 1.13.1
 
-Installing a virtual environment using python3 using bash:
-```
-	sudo pip3 install virtualenv virtualenvwrapper
-	echo "# Virtual Environment Wrapper"  >> ~/.bashrc
-	echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.bashrc
-	source ~/.bashrc
-```
-Or using zsh:
+Installing a virtual environment using python3 using zsh:
 ```
 	sudo pip3 install virtualenv virtualenvwrapper
 	echo "# Virtual Environment Wrapper"  >> ~/.zshrc
@@ -56,44 +49,12 @@ Also, I provided a list of requirements, which you can install as follows:
 
 Note: OpenCV is not included in these requirements. I follow this [tutorial](https://www.learnopencv.com/install-opencv3-on-ubuntu/) to install it, except I used version 3.4.
 
-## Utils
+## Utilities
 
-I designed a couple of utilities to fetch and prepare the dataset for training. 
-
-### Data Fetch 
-
-This is to fetch a dataset from the server where I stored the images. 
-
+To download images:
 ```
-	python utils/fetch_dataset_parallel.py --outpath data/
-
+	python utils/google_download.py --outpath path/to/output/data --keywords add,your,keywords --prefixes prefix --limit 1000 -chrome /path/to/chromedriver
 ```
-
-Or
-
-```
-	python utils/fetch_dataset_serial.py --outpath data/
-```
-
-# ---------------------------------------------
-# ADD TO README: Classification framework and Training process. 
-
-### Data Processing 
-
-These are scripts to change dataset colorspaces and perform offline data augmentation. 
-
-```
-	python utils/preprocess.py --inpath path/to/input/data --outpath path/to/output/data --crop v
-```
-
-### Data Split
-
-This code is to split data into train and test sets. Furthermore, the train set is divided into train and validation during the training process. 
-
-```
-	python utils/split.py --inpath path/to/input/data --opath path/to/output/data --test_set 0.2
-```
-
 
 ### Entrenamiento de la red (end-to-end)
 ```
@@ -135,18 +96,3 @@ Al abrir en la dirección de loopback (e.g. http://127.0.1.1:6006) indicada por 
 
 ## Arquitectura actual del clasificador
 <p align="center"><img src="./readme/alexnet.png" /> </p>
-
-
-### TODOS:
--[x] Implementar Alexnet 
--[x] Implementar VGG16 con entrenamiento end-to-end, restore y finetuning 
--[ ] Implementar ResNet con entrenamiento end-to-end, restore y finetuning 
--[ ] Implementar Inception con entrenamiento end-to-end, restore y finetuning 
--[ ] Implementar SqueezeNet con entrenamiento end-to-end, restore y finetuning 
--[ ] Conseguir modelo pre-entreando para Inception, ResNet y SqueezeNet
--[ ] Implementar finetuning para Inception
--[ ] Documentacion de codigo - wiki
--[ ] Agregar bash scripts para correr pruebas las redes
--[ ] Agregar funcionalidad de entrenamiento multiescala 
--[ ] Implement GUI to test models
--[ ] Modular data fetch
