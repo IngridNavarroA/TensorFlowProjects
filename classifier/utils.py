@@ -1,16 +1,20 @@
 class Color:
-    BLUE  = '\033[94m'
-    GREEN = '\033[92m'
-    FAIL  = '\033[91m'
-    DONE  = '\033[0m'
+    BLUE   = '\033[94m'
+    YELLOW = '\033[93m'
+    GREEN  = '\033[92m'
+    RED    = '\033[91m'
+    WHITE  = '\033[0m'
 
 def info_msg(msg):
-	print(Color.GREEN+"[INFO] "+msg+Color.DONE)
+	print(Color.GREEN+"[INFO] "+msg+Color.WHITE)
 
 def err_msg(msg):
-	print(Color.FAIL+"[ERROR] "+msg)
-	print("Killing program."+Color.DONE)
+	print(Color.RED+"[ERROR] "+msg)
+	print("Killing program."+Color.WHITE)
 	exit()
 
+def warn_msg(msg):
+	print(Color.YELLOW+"[WARN] "+msg)
+
 def done_msg(msg=''):
-	print(Color.BLUE+"[DONE] "+msg+Color.DONE)
+	print(Color.BLUE+"[DONE] "+msg+Color.WHITE)
