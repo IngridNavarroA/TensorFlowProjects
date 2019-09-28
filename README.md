@@ -17,8 +17,8 @@ The API allows to perform end-to-end training, fine-tuning and restoring a train
 
 This code has been implemented / tested / maintained with:
 - OpenCV >= 3.4
-- Python3 
-- Tensorflow == 1.13.1
+- Python3.6
+- Tensorflow == 1.14.0
 
 Installing a virtual environment using python3 using zsh:
 ```
@@ -30,20 +30,19 @@ Installing a virtual environment using python3 using zsh:
 
 Create virtual environment with python3:
 ```
-	mkvirtualenv tf-classifier -p python3
-	workon tf-classifier
+	mkvirtualenv classifier -p python3
 ```
 
 Test python version on virtual enviornment:
 ```
-	workon tf-classifier
+	workon classifier
 	python -V
 	deactivate
 ```
 
 Also, I provided a list of requirements, which you can install as follows: 
 ```
-	workon tf-classifier
+	workon classifier
 	pip install -r requirements.txt
 ```
 
@@ -58,25 +57,25 @@ To download images:
 
 ### Entrenamiento de la red (end-to-end)
 ```
-	workon tf-classifier
-  python src/classifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 0 --fintune 0
+	workon classifier
+  python classifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 0 --fintune 0
 ```
 
 ### Finetunning de la red
 ```
-	workon tf-classifier
-	python src/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 0 --fintune 1
+	workon classifier
+	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 0 --fintune 1
 ```
 
 ### Restaurar entrenamiento de la red
 ```
-	workon tf-classifier
-	python src/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 1
+	workon classifier
+	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 1
 ```
 
 ### Visualización de entrenamiento 
 ```
-	workon tf-classifier
+	workon classifier
 	tensorboard --logdir=log
 ```
 

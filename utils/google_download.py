@@ -28,5 +28,5 @@ paths = response.download(arguments)
 for key in args.keywords.split(','):
 	file_path = os.path.join(args.outpath, key+".txt")
 	with open(file_path, "a") as f:
-		for path in paths[0][key]:
+		for path in paths[0][args.prefixes + " " + key]:
 			f.write(path+"\n")

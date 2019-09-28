@@ -1,11 +1,11 @@
+google_images_download
 scipy
 matplotlib
 scikit-image
 scikit-learn
-easydict==1.6
-joblib==0.10.3
-numpy==1.16.0
-Pillow==4.0.0
-tensorflow-gpu==1.13.1
+easydict
+joblib
+numpy
+Pillow
 tqdm
-google_images_download
+tensorflow-gpu
