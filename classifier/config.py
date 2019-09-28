@@ -6,7 +6,7 @@
 import os
 
 class Configuration():
-	def	__init__(self, data_path, stage, num_epochs, network):
+	def	__init__(self, data_path, stage, network):
 
 		self.data_path   = data_path
 		self.classes     = os.listdir(self.data_path)
@@ -25,7 +25,6 @@ class Configuration():
 		self.dropout_rate = 0.5
 		
 		self.adam_momentum = 0.5
-		self.num_epochs = num_epochs
 		self.save_each_n = 20
 		self.restore_lim = 0.90
 

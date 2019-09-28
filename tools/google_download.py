@@ -7,6 +7,7 @@ ap.add_argument("--outpath",  required=True, help="Path to output files")
 ap.add_argument("--keywords", required=True, help="Google search keywords")
 ap.add_argument("--prefixes", help="Prefix keywords to be added to the query")
 ap.add_argument("--limit",    default=20,    help="How many images to download")
+ap.add_argument("--format",    default="jpg", help="Download image format")
 ap.add_argument("--chrome",   help="Path to the chrome driver")
 args = ap.parse_args()
 
@@ -20,7 +21,7 @@ arguments = { "keywords"         : args.keywords,
               "limit"            : args.limit,
               "output_directory" : args.outpath,
               "chromedriver"     : args.chrome,
-              "format"           : "png",
+              "format"           : args.format,
 	            "print_urls"       : True,
 	          }
 paths = response.download(arguments)

@@ -14,8 +14,8 @@ def err_msg( msg ):
 	print( "Killing program."+Color.WHITE )
 	exit()
 
-def debug_msg( msg ):
-	print( Color.PINK + "[DEBUG] " + msg )
+def watch_msg( msg ):
+	print( Color.PINK + "[WATCH] " + msg )
 
 def warn_msg( msg ):
 	print( Color.YELLOW + "[WARN] " + msg )

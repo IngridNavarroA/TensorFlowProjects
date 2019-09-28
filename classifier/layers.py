@@ -4,6 +4,7 @@
 	@brief:  Layer wrappers 
 """
 import tensorflow as tf
+from utils.logger import watch_msg
 
 def variable_summary(var):
 	""" Wrapper that adds summary to Tensor variable to be visualized 
@@ -29,7 +30,7 @@ def conv(name, x, fsize, nfilters, stride=1, padding='SAME', groups=1, stddev=0.
 	
 	ninputs = int(x.get_shape()[-1].value / groups)
 	convolve = lambda i, w: tf.nn.conv2d(i, w, 
-		strides=[1, stride, stride, 1], padding=padding)
+																strides=[1, stride, stride, 1], padding=padding)
 
 	with tf.compat.v1.variable_scope(name) as scope:
 
@@ -53,7 +54,7 @@ def conv(name, x, fsize, nfilters, stride=1, padding='SAME', groups=1, stddev=0.
 
 		layer += b
 
-		print("\t[LAYER] {} has shape {}".format(name, layer.shape))
+		watch_msg("\tLayer {} has shape {}".format(name, layer.shape))
 		return tf.nn.relu(layer, name=scope.name)
 
 def lrn(x, radius, alpha, beta, bias=1.0):
@@ -67,9 +68,9 @@ def maxpool(name, x, fsize=3, stride=2, padding='SAME'):
 		layer = tf.compat.v1.nn.max_pool(value=x, ksize=[1, fsize, fsize, 1], 
 			strides=[1, stride, stride, 1], padding=padding)       
 		
-		variable_summary(layer)
+		# variable_summary(layer)
 
-		print("\t[LAYER] {} has shape {}".format(name, layer.shape))	
+		watch_msg("\tLayer {} has shape {}".format(name, layer.shape))	
 		return layer
 
 def flatten(x):
@@ -77,7 +78,7 @@ def flatten(x):
 		one-dimension tensor. """
 	layer_shape = x.get_shape()
 	nfeatures = layer_shape[1:].num_elements()
-	print("\t[LAYER] flatted to {} features".format(nfeatures))
+	watch_msg("\tLayer flatted to {} features".format(nfeatures))
 	return tf.reshape(x, [-1, nfeatures])
 
 def fc(name, x, noutputs, relu=True, stddev=0.05, binit_val=0.05):
@@ -99,7 +100,7 @@ def fc(name, x, noutputs, relu=True, stddev=0.05, binit_val=0.05):
 
 		if relu:
 			layer = tf.nn.relu(layer)
-		print("\t[LAYER] {} has shape {}".format(name, layer.shape))
+		watch_msg("\tLayer {} has shape {}".format(name, layer.shape))
 		return layer
 
 def dropout(x, keep_prob=0.5):
@@ -111,7 +112,7 @@ def inception(name, x, conv1_size, conv3_red_size, conv3_size, conv5_red_size, c
 	""" Inception module. """
 	with tf.compat.v1.variable_scope(name) as scope:
 		
-		print("\n\t[MODULE] {}".format(name))
+		watch_msg("\n\tModule {}".format(name))
 		conv1 = conv('{}_1x1'.format(name), x=x, fsize=1, nfilters=conv1_size)
 		
 		conv3_red = conv('{}_3x3_red'.format(name), x=x, fsize=1, nfilters=conv3_red_size)

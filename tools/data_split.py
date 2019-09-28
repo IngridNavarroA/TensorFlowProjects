@@ -25,17 +25,16 @@ def main():
 	args = ap.parse_args()
 
 	# Create base output directory and train and test sub-directories
-	out_dirname = os.path.join( args.outpath, args.outdir )
-	if not os.path.exists( out_dirname ):
-		os.makedirs( out_dirname )
+	if not os.path.exists( args.outpath ):
+		os.makedirs( args.outpath )
 
-	train_path = os.path.join( out_dirname, "train_data" )
+	train_path = os.path.join( args.outpath, "train_data", args.outdir )
 	if not os.path.exists( train_path ):
-		os.mkdir( train_path )
+		os.makedirs( train_path )
 
-	test_path = os.path.join( out_dirname, "test_data" )
+	test_path = os.path.join( args.outpath, "test_data", args.outdir )
 	if not os.path.exists( test_path ):
-		os.mkdir( test_path )
+		os.makedirs( test_path )
 
 	files = [ f for f in glob.glob( args.inpath + "**/*."+args.img_format ) ]
 	random.shuffle( files )
