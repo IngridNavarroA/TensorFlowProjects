@@ -27,7 +27,7 @@ class Configuration():
 		self.adam_momentum = 0.5
 		self.num_epochs = num_epochs
 		self.save_each_n = 20
-		self.restore = 0.90
+		self.restore_lim = 0.90
 
 		if network == "alexnet":
 			self.learning_rate = 1e-4
