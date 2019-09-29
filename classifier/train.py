@@ -17,13 +17,13 @@ from utils.logger import *
 from config import *
 import utils.dataset as dataset
 import networks as N
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import time as t
 import os
 
 np.random.seed( 1 )
-tf.compat.v1.set_random_seed( 2 )
+tf.set_random_seed( 2 )
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string( 'data_path', './data/cat-dog/training_data/', 
@@ -95,9 +95,9 @@ def train():
 	except IOError:
 		err_msg( "Could not load images." )
 
-	sess = tf.compat.v1.Session()
+	sess = tf.Session()
 
-	x = tf.compat.v1.placeholder( tf.float32, 
+	x = tf.placeholder( tf.float32, 
 		      shape=[None, cfg.img_height, cfg.img_width, cfg.img_depth], name='x' )
 	
 	info_msg( "Loading architecture {}...".format( FLAGS.net ) )
@@ -113,32 +113,32 @@ def train():
 	done_msg()
 
 	# Output 
-	y = tf.compat.v1.placeholder( tf.float32, shape=[None, cfg.num_classes], name='y')
+	y = tf.placeholder( tf.float32, shape=[None, cfg.num_classes], name='y')
 	y_cls = tf.argmax( y, axis=1 )
 	y_hat = tf.nn.softmax( out, name='y_hat' )
 	y_hat_cls = tf.argmax( y_hat, axis=1 )
 
 	# Get all trainable variables 
-	var_list = [ v for v in tf.compat.v1.trainable_variables() ]
+	var_list = [ v for v in tf.trainable_variables() ]
 
 	with tf.name_scope('loss'):
 		cost = tf.nn.softmax_cross_entropy_with_logits_v2( logits=out, labels=y )
 		cost = tf.reduce_mean( cost )
-		tf.compat.v1.summary.scalar( 'softmax_cross_entropy', cost )
+		tf.summary.scalar( 'softmax_cross_entropy', cost )
 
 	with tf.name_scope('optimizer'):
-		optimizer = tf.compat.v1.train.AdamOptimizer( 
+		optimizer = tf.train.AdamOptimizer( 
 			cfg.learning_rate ).minimize( cost, var_list = var_list )
 		
 	with tf.name_scope('accuracy'):
 		correct_pred = tf.cast( tf.equal( y_hat_cls, y_cls ), tf.float32 )
 		accuracy = tf.reduce_mean( correct_pred )
-		tf.compat.v1.summary.scalar( 'accuracy', accuracy )
+		tf.summary.scalar( 'accuracy', accuracy )
 
-	train_writer = tf.compat.v1.summary.FileWriter( FLAGS.logs_path + 'train', sess.graph )
-	val_writer = tf.compat.v1.summary.FileWriter( FLAGS.logs_path + 'val', sess.graph )
-	merge = tf.compat.v1.summary.merge_all()
-	saver = tf.compat.v1.train.Saver( max_to_keep=FLAGS.ckpts_to_keep )
+	train_writer = tf.summary.FileWriter( FLAGS.logs_path + 'train', sess.graph )
+	val_writer = tf.summary.FileWriter( FLAGS.logs_path + 'val', sess.graph )
+	merge = tf.summary.merge_all()
+	saver = tf.train.Saver( max_to_keep=FLAGS.ckpts_to_keep )
 	
 	curr_iter, iter_batch = 0, int( train_set.num_examples / cfg.batch_size )
 
@@ -147,7 +147,7 @@ def train():
 		info_msg( "Finetuning {} layers {} ..."
 			.format( FLAGS.net, model_dict["train_layers"] ) )
 		model.load_weights( model_dict["weights"], model_dict["train_layers"], sess)
-		sess.run( tf.compat.v1.global_variables_initializer() )
+		sess.run( tf.global_variables_initializer() )
 		done_msg()
 
 	elif FLAGS.restore:
@@ -168,7 +168,7 @@ def train():
 			err_msg("Could not load checkpoint.")
 	else: 
 		""" Training form scratch """
-		sess.run( tf.compat.v1.global_variables_initializer())
+		sess.run( tf.global_variables_initializer())
 		info_msg("Performing end-to-end training.")
 
 	# Training 
@@ -201,7 +201,7 @@ def train():
 			watch_msg(msg.format(epoch+1, train_acc, train_loss, val_acc, val_loss, t.time()-start, i, FLAGS.max_iter))
 			start = t.time()
 
-			saver.save(sess, FLAGS.model_path+'model-epoch-{}'.format(epoch), write_meta_graph=FLAGS.meta)
+			saver.save(sess, FLAGS.model_path+'model-epoch-{}'.format(epoch), write_meta_graph=FLAGS.save_meta)
 
 	done_msg("Finished training.")
 
@@ -218,7 +218,7 @@ def main(argv=None):
 	train()
 
 if __name__ == '__main__':
-	tf.compat.v1.app.run()
+	tf.app.run()
 
 
 

@@ -15,7 +15,6 @@ if not os.path.exists(args.outpath):
 	os.mkdir(args.outpath)
 
 response = google_images_download.googleimagesdownload()
-
 arguments = { "keywords"         : args.keywords,
 							"prefix_keywords"  : args.prefixes,
               "limit"            : args.limit,
