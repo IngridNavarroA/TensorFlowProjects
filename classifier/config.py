@@ -46,6 +46,8 @@ class Configuration():
 			self.img_width  = 224
 			self.img_height = 224
 			self.learning_rate = 1e-4
-			pass
-		elif network == "squeezenet":
-			pass
+			self.net_dict = {
+				"train_layers" : [],
+				"meta_file"    : './pretrained/inception/inception.meta',
+				"weights"	     : './pretrained/inception/inception.npz'
+			}

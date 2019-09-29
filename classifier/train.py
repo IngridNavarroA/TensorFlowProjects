@@ -6,7 +6,6 @@
 			 	- Alexnet
 			 	- VGG16
 			 	- Inception (in progress)
-			 	- SqueezeNet (in progress)
 			 Types of training supported:
 			 	- End-to-end
 			 	- Restoring 
@@ -62,8 +61,7 @@ def train():
 
 	# Assert correct parameters. 
 	assert FLAGS.net.lower() == 'alexnet' or FLAGS.net.lower() == 'inception' \
-	    or FLAGS.net.lower() == 'vgg'     or FLAGS.net.lower() == 'squeezenet', \
-	    err_msg( "Network not supported." )
+	    or FLAGS.net.lower() == 'vgg', err_msg( "Network not supported." )
 
 	assert FLAGS.img_format.lower() == 'png'  \
 	    or FLAGS.img_format.lower() == 'jpg', \
