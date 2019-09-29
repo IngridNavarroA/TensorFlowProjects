@@ -26,7 +26,6 @@ class Configuration():
 		
 		self.adam_momentum = 0.5
 		self.save_each_n = 20
-		self.restore_lim = 0.90
 
 		if network == "alexnet":
 			self.learning_rate = 1e-4
@@ -45,8 +44,6 @@ class Configuration():
 				"weights"	     : './pretrained/vgg16/vgg16_weights.npz'
 			}
 
-		elif network == "resnet":
-			pass
 		elif network == "inception":
 			pass
 		elif network == "squeezenet":

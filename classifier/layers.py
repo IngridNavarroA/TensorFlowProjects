@@ -1,7 +1,7 @@
 """
 	@author: Ingrid Navarro 
 	@date:   May 10th, 2019
-	@brief:  Layer wrappers 
+	@brief:  Layer and module wrappers 
 """
 import tensorflow.compat.v1 as tf
 from utils.logger import watch_msg

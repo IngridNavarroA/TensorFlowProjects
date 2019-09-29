@@ -6,9 +6,10 @@
 import layers as L
 import tensorflow as tf
 import numpy as np
+from utils.logger import watch_msg
 
 class Alexnet():
-	def __init__(self, cfg ):
+	def __init__(self, cfg):
 		self.cfg = cfg
 
 	def load_net(self, x):
@@ -45,7 +46,7 @@ class Alexnet():
 
 			# Load pre-trained weights on layers that won't be trained
 			with tf.compat.v1.variable_scope(layer, reuse=True):
-				print("\t[FINETUNE] Loading parameters for layer {}".format(layer))
+				watch_msg("\tLoading parameters for layer {}".format(layer))
 				for data in weights[layer]:
 					if len(data.shape) == 1:
 						var = tf.get_variable('biases', trainable=False)
@@ -54,11 +55,10 @@ class Alexnet():
 					sess.run(var.assign(data))
 
 class VGG16():
-	def __init__(self, nclasses, prob=0.4):
-		self.num_classes = nclasses
-		self.keep_prob = prob
+	def __init__(self, cfg):
+		self.cfg = cfg
 
-	def load_net(self, x, training=False):
+	def load_net(self, x):
 		conv1_1 = L.conv('conv1_1', x=x, fsize=3, nfilters=64) #default padding='SAME', stride=1
 		conv1_2 = L.conv('conv1_2', x=conv1_1, fsize=3, nfilters=64)
 		pool1   = L.maxpool('pool1', x=conv1_2, fsize=2, stride=2)
@@ -85,44 +85,32 @@ class VGG16():
 		# FIX THIS DESIGN 
 		flat  = L.flatten(x=pool5)
 		fc6   = L.fc('fc6', x=flat, noutputs=4096, binit_val=1.0)
-		if training:
-			fc6  = L.dropout(x=fc6, keep_prob=self.keep_prob)
+		if self.cfg.is_training:
+			fc6  = L.dropout(x=fc6, keep_prob=self.cfg.dropout_rate)
 
 		fc7   = L.fc('fc7', x=fc6, noutputs=4096, binit_val=1.0)
-		if training:
-			fc7  = L.dropout(x=fc7, keep_prob=self.keep_prob)
+		if self.cfg.is_training:
+			fc7  = L.dropout(x=fc7, keep_prob=self.cfg.dropout_rate)
 
-		return L.fc('fc8', x=fc7, noutputs=self.num_classes, relu=False)
+		return L.fc('fc8', x=fc7, noutputs=self.cfg.num_classes, relu=False)
 
-	def load_weights(self, weights_path, train_layer, sess):
-		weights = np.load(weights_path)
+	def load_weights(self, sess):
+		weights = np.load( self.cfg.net_dict[ "weights" ] )
 
 		for i, layer_name in enumerate(weights.keys()):
 			name_split = layer_name.split('_') # split w, b from name
 			layer = '_'.join(name_split[:-1])
 			
-			if layer in train_layer:
+			if layer in self.cfg.net_dict[ "train_layers" ]:
 				continue
 
 			with tf.variable_scope(layer, reuse=True):
-				print("\t[FINETUNE] Loading parameters for layer {}".format(layer))
+				watch_msg("\tLoading parameters for layer {}".format(layer))
 				if name_split[-1] == 'W':
 					var = tf.get_variable('weights', trainable=False)
 				elif name_split[-1] == 'b':
 					var = tf.get_variable('biases', trainable=False)
 				sess.run(var.assign(weights[layer_name]))
-
-class ResNet50():
-	def __init__(self, nclasses, prob=0.5):
-		self.num_classes = nclasses
-		self.keep_prob = prob
-
-	def load_net(self, x, train):
-		pass
-
-	def load_weights(self):
-		pass
-
 
 class Inception():
 	def __init__(self, nclasses, prob=0.4):

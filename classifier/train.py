@@ -53,9 +53,9 @@ tf.app.flags.DEFINE_boolean( 'restore', False,
 tf.app.flags.DEFINE_boolean( 'save_meta', False, 
 	                           """Save metafiles (True). """ )
 
-def get_current_iteration( epoch, iter_batch ):
+def get_current_iteration( epoch, iter_per_batch ):
 	""" If restoring a model, return the last iteration. """
-	return int( epoch * iter_batch )
+	return epoch * iter_batch 
 
 
 def train():
@@ -63,8 +63,7 @@ def train():
 
 	# Assert correct parameters. 
 	assert FLAGS.net.lower() == 'alexnet' or FLAGS.net.lower() == 'inception' \
-	    or FLAGS.net.lower() == 'vgg'     or FLAGS.net.lower() == 'resnet' \
-	    or FLAGS.net.lower() == 'squeezenet', \
+	    or FLAGS.net.lower() == 'vgg'     or FLAGS.net.lower() == 'squeezenet', \
 	    err_msg( "Network not supported." )
 
 	assert FLAGS.img_format.lower() == 'png'  \
@@ -104,10 +103,9 @@ def train():
 	if FLAGS.net.lower() == 'alexnet':
 		model     =  cnn.Alexnet( cfg )
 		inference =  model.load_net( x )
-
-	# elif FLAGS.net == 'vgg':
-	# 	model = cnn.VGG16( cfg.num_classes )
-	# 	out   = model.load( x, training=True )
+	elif FLAGS.net == 'vgg':
+		model = cnn.VGG16( cfg )
+		inference   = model.load_net( x )
 
 	done_msg()
 
@@ -138,7 +136,8 @@ def train():
 	merge = tf.summary.merge_all()
 	saver = tf.train.Saver( max_to_keep=FLAGS.ckpts_to_keep )
 	
-	curr_iter, iter_batch = 0, int( train_set.num_examples / cfg.batch_size )
+	curr_iter = 0 
+	iter_per_batch = int( train_set.num_examples / cfg.batch_size )
 
 	if FLAGS.finetune and not FLAGS.restore:
 		""" Finetuning """
@@ -161,7 +160,6 @@ def train():
 
 			# Get current iteration from restored model 
 			curr_iter = get_current_iteration( int( checkpoint.split('-')[-1]), iter_batch )
-			curr_iter = 0 if curr_iter > int(cfg.restore_lim * FLAGS.max_iter ) else curr_iter
 		except:
 			err_msg("Could not load checkpoint.")
 	else: 
@@ -170,7 +168,7 @@ def train():
 		info_msg("Performing end-to-end training.")
 
 	# Training 
-	info_msg("Starting training...")
+	info_msg( "Starting training..." )
 	start = t.time()
 	for i in range( curr_iter, FLAGS.max_iter ):
 
@@ -183,10 +181,9 @@ def train():
 
 		sess.run( optimizer, feed_dict=train_dict )
 
-		if i % iter_batch == 0:
-			epoch = int( i / iter_batch )
-			epochs_done = train_set.epochs_done
-
+		if i % iter_per_batch == 0:
+			epoch = train_set.epochs_done
+		
 			# Show progress 
 			train_loss = sess.run( cost, feed_dict=train_dict )
 			summary, train_acc = sess.run( [ merge, accuracy ], feed_dict=train_dict )
@@ -196,11 +193,13 @@ def train():
 			summary, val_acc = sess.run( [ merge, accuracy ], feed_dict=val_dict )
 			val_writer.add_summary( summary, epoch )
 
-			msg = "\tEPOCH {0} EPOCHSDONE {1} --Train[Acc:{2:>6.1%}, Loss:{3:.3f}] --Val[Acc:{4:>6.1%}, Loss:{5:.3f}] --Time:{6:.3f} --[{7} / {8}]"
-			watch_msg(msg.format(epoch+1, epochs_done+1, train_acc, train_loss, val_acc, val_loss, t.time()-start, i, FLAGS.max_iter))
+			msg = "\tEPOCH {} --Train[Acc:{:>6.1%}, Loss:{:.3f}] --Val[Acc:{:>6.1%}, Loss:{:.3f}] --Time:{:.3f} --[{} / {}]"
+			watch_msg( msg.format( epoch+1, train_acc, train_loss, val_acc, val_loss, 
+				 										 t.time()-start, i, FLAGS.max_iter ) )
 			start = t.time()
 
-			saver.save(sess, FLAGS.model_path+'model-epoch-{}'.format(epoch), write_meta_graph=FLAGS.save_meta)
+			saver.save( sess, FLAGS.model_path+'model-epoch-{}'.format(epoch), 
+				          write_meta_graph=FLAGS.save_meta )
 
 	done_msg("Finished training.")
 
