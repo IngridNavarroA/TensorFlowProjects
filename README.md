@@ -6,7 +6,6 @@ Supported models:
 - AlexNet 
 - VGG16
 - Inception (In progress)
-- ResNet (In progress)
 - SqueezeNet (In progress)
 
 You can also implement your own model using the layer and module wrappers, and add more wrappers as you need them. 
