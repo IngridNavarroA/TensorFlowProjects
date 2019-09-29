@@ -63,13 +63,22 @@ def lrn(x, radius, alpha, beta, bias=1.0):
 		depth_radius=radius, alpha=alpha, beta=beta, bias=bias)
 
 def maxpool(name, x, fsize=3, stride=2, padding='SAME'):
-	""" Wrapper for Pooling layer. """
+	""" Wrapper for Max Pooling layer. """
 	with tf.variable_scope(name):
 		layer = tf.nn.max_pool(value=x, ksize=[1, fsize, fsize, 1], 
 			strides=[1, stride, stride, 1], padding=padding)       
 		
-		# variable_summary(layer)
+		variable_summary(layer)
+		watch_msg("\tLayer {} has shape {}".format(name, layer.shape))	
+		return layer
 
+def avgpool(name, x, fsize=3, stride=2, padding='SAME'):
+	""" Wrapper for Average Pooling layer. """
+	with tf.variable_scope(name):
+		layer = tf.nn.avg_pool(value=x, ksize=[1, fsize, fsize, 1], 
+			strides=[1, stride, stride, 1], padding=padding)       
+		
+		variable_summary(layer)
 		watch_msg("\tLayer {} has shape {}".format(name, layer.shape))	
 		return layer
 
@@ -121,8 +130,10 @@ def inception(name, x, conv1_size, conv3_red_size, conv3_size, conv5_red_size, c
 		conv5_red = conv('{}_5x5_red'.format(name), x=x, fsize=1, nfilters=conv5_red_size)
 		conv5 = conv('{}_5x5'.format(name), x=conv5_red, fsize=5, nfilters=conv5_size)
 		
-		pool = maxpool('{}_pool'.format(name), x=x, fsize=1, stride=1, padding='VALID')
+		pool = maxpool('{}_pool'.format(name), x=x, fsize=3, stride=1)
 		pool_proj = conv('{}_pool_proj'.format(name), x=pool, fsize=1, nfilters=pool_proj_size)
 
-		return tf.concat([conv1, conv3, conv5, pool_proj], axis=3, name='{}_concat'.format(name))
+		concat = tf.concat([conv1, conv3, conv5, pool_proj], axis=3, name='{}_concat'.format(name))
+		watch_msg("\tLayer {} has shape {}".format(name, concat.shape))
+		return concat
 

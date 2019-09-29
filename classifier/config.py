@@ -16,8 +16,8 @@ class Configuration():
 		# Image configuration
 		self.img_scale  = 1.0
 		self.img_depth  = 3
-		self.img_width  = 256
-		self.img_height = 256
+		self.img_width  = 227
+		self.img_height = 227
 
 		# Training configuration 
 		self.split_size = 0.15
@@ -29,7 +29,6 @@ class Configuration():
 
 		if network == "alexnet":
 			self.learning_rate = 1e-4
-			self.optimizer     = "adam"
 			self.net_dict      = {
 				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4', 'conv3', 'conv2', 'conv1'],
 				"meta_file"	   : './pretrained/alexnet/alexnet.meta',
@@ -37,7 +36,6 @@ class Configuration():
 			}
 		elif network == "vgg":
 			self.learning_rate = 1e-4
-			self.optimizer     = "sgd"
 			self.net_dict = {
 				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1', 'conv4_3', 'conv4_2', 'conv4_1'],
 				"meta_file"    : './pretrained/vgg16/vgg16.meta',
@@ -45,6 +43,9 @@ class Configuration():
 			}
 
 		elif network == "inception":
+			self.img_width  = 224
+			self.img_height = 224
+			self.learning_rate = 1e-4
 			pass
 		elif network == "squeezenet":
 			pass

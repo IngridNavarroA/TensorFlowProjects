@@ -113,36 +113,48 @@ class VGG16():
 				sess.run(var.assign(weights[layer_name]))
 
 class Inception():
-	def __init__(self, nclasses, prob=0.4):
-		self.num_classes = nclasses
-		self.keep_prob = prob
+	def __init__(self, cfg):
+		self.cfg = cfg
 
-	def load_net(self, x, train):
-		conv1 = L.conv('conv1', x=x, fsize=5, nfilters=64, stride=1, train=train)
-		pool1 = L.maxpool('pool1', x=conv1, padding='VALID')
-
-		inception2a = L.inception('inception2a', x=pool1, 
-			conv1_size=64, conv3_red_size=96, conv3_size=128, 
-			conv5_red_size=16, conv5_size=32, pool_proj_size=32)
-		inception2b = L.inception('inception2b', x=inception2a, 
+	def load_net(self, x):
+		conv1 = L.conv('conv1', x=x, fsize=7, nfilters=64, stride=2 )
+		pool1 = L.maxpool('pool1', x=conv1)
+		conv2 = L.conv('conv2', x=pool1, fsize=3, nfilters=192, stride=1 )
+		pool2 = L.maxpool('pool2', x=conv2)
+		inception3a = L.inception('inception3a', x=pool2, 
+		 	conv1_size=64, conv3_red_size=96, conv3_size=128, 
+		 	conv5_red_size=16, conv5_size=32, pool_proj_size=32)
+		inception3b = L.inception('inception3b', x=inception3a, 
 			conv1_size=128, conv3_red_size=128, conv3_size=192, 
 			conv5_red_size=32, conv5_size=96, pool_proj_size=64)
-		pool2 = L.maxpool('pool2', x=inception2b, padding='VALID')
-
-		inception3a = L.inception('inception3a', x=pool2, 
+		pool3 = L.maxpool('pool2', x=inception3b)
+		inception4a = L.inception('inception4a', x=pool3, 
 			conv1_size=192, conv3_red_size=96, conv3_size=208, 
 			conv5_red_size=16, conv5_size=48, pool_proj_size=64)
-		inception3b = L.inception('inception3b', x=inception3a, 
+		inception4b = L.inception('inception4b', x=inception4a, 
 			conv1_size=160, conv3_red_size=112, conv3_size=224, 
 			conv5_red_size=24, conv5_size=64, pool_proj_size=64)
-
-		gap = tf.nn.avg_pool(inception3b, ksize=[1, 6, 6, 1], 
-			strides=[1, 1, 1, 1], padding='VALID', name='gap')
-
-		gap_dropout  = L.dropout(x=gap, keep_prob=self.keep_prob)
-		flat  = L.flatten(x=gap_dropout)
-
-		return L.fc('fc4', x=flat, noutputs=self.num_classes, relu=False)
+		inception4c = L.inception('inception4c', x=inception4b, 
+			conv1_size=128, conv3_red_size=128, conv3_size=256, 
+			conv5_red_size=24, conv5_size=64, pool_proj_size=64)
+		inception4d = L.inception('inception4d', x=inception4c, 
+			conv1_size=112, conv3_red_size=144, conv3_size=288, 
+			conv5_red_size=32, conv5_size=64, pool_proj_size=64)
+		inception4e = L.inception('inception4e', x=inception4d, 
+			conv1_size=256, conv3_red_size=160, conv3_size=320, 
+			conv5_red_size=32, conv5_size=128, pool_proj_size=128)
+		pool4 = L.maxpool('pool4', x=inception4e)
+		inception5a = L.inception('inception5a', x=pool4, 
+			conv1_size=256, conv3_red_size=160, conv3_size=320, 
+			conv5_red_size=32, conv5_size=128, pool_proj_size=128)
+		inception5b = L.inception('inception5b', x=inception5a, 
+			conv1_size=384, conv3_red_size=192, conv3_size=384, 
+			conv5_red_size=48, conv5_size=128, pool_proj_size=128)
+		pool5 = L.avgpool('pool5', x=inception5b, fsize=7, stride=1, padding='VALID')
+		if self.cfg.is_training:
+			pool5  = L.dropout(x=pool5, keep_prob=self.cfg.dropout_rate)
+		flat  = L.flatten(x=pool5)
+		return L.fc('fc4', x=flat, noutputs=self.cfg.num_classes, relu=False)
 
 	def load_weights(self, weights_path, train_layer, sess):
 		pass 

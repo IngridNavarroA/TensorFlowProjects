@@ -5,7 +5,6 @@
 			 Supported neural networks:
 			 	- Alexnet
 			 	- VGG16
-			 	- ResNet (in progress)
 			 	- Inception (in progress)
 			 	- SqueezeNet (in progress)
 			 Types of training supported:
@@ -103,9 +102,12 @@ def train():
 	if FLAGS.net.lower() == 'alexnet':
 		model     =  cnn.Alexnet( cfg )
 		inference =  model.load_net( x )
-	elif FLAGS.net == 'vgg':
-		model = cnn.VGG16( cfg )
-		inference   = model.load_net( x )
+	elif FLAGS.net.lower() == 'vgg':
+		model     = cnn.VGG16( cfg )
+		inference = model.load_net( x )
+	elif FLAGS.net.lower() == 'inception':
+		model     = cnn.Inception( cfg )
+		inference = model.load_net( x )
 
 	done_msg()
 
