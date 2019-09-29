@@ -16,7 +16,7 @@
 from utils.logger import * 
 from config import *
 import utils.dataset as dataset
-import networks as N
+import networks as cnn
 import tensorflow.compat.v1 as tf
 import numpy as np
 import time as t
@@ -80,7 +80,7 @@ def train():
 
 	try:
 		info_msg( "Loading training configuration..." )
-		cfg = Configuration( FLAGS.data_path, "train", FLAGS.net.lower() )
+		cfg = Configuration( FLAGS.data_path, FLAGS.net.lower(), True )
 		done_msg() 
 	except:
 		err_msg( "Could not load configuration. Is your data path: {} ?".format( 
@@ -96,33 +96,31 @@ def train():
 		err_msg( "Could not load images." )
 
 	sess = tf.Session()
-
-	x = tf.placeholder( tf.float32, 
-		      shape=[None, cfg.img_height, cfg.img_width, cfg.img_depth], name='x' )
 	
+	x = tf.placeholder( tf.float32, 
+	   		shape=[None, cfg.img_height, cfg.img_width, cfg.img_depth], name='x' )
+
 	info_msg( "Loading architecture {}...".format( FLAGS.net ) )
 	if FLAGS.net.lower() == 'alexnet':
-		model =  N.Alexnet( cfg.num_classes, cfg.dropout_rate )
-		out   =  model.load_net( x, training=True )
+		model     =  cnn.Alexnet( cfg )
+		inference =  model.load_net( x )
 
-	elif FLAGS.net == 'vgg':
-		model = N.VGG16( cfg.num_classes )
-		out   = model.load_net( x, training=True )
-	
-	model_dict = cfg.net_dict
+	# elif FLAGS.net == 'vgg':
+	# 	model = cnn.VGG16( cfg.num_classes )
+	# 	out   = model.load( x, training=True )
+
 	done_msg()
 
-	# Output 
 	y = tf.placeholder( tf.float32, shape=[None, cfg.num_classes], name='y')
 	y_cls = tf.argmax( y, axis=1 )
-	y_hat = tf.nn.softmax( out, name='y_hat' )
+	y_hat = tf.nn.softmax( inference, name='y_hat' )
 	y_hat_cls = tf.argmax( y_hat, axis=1 )
 
 	# Get all trainable variables 
 	var_list = [ v for v in tf.trainable_variables() ]
 
 	with tf.name_scope('loss'):
-		cost = tf.nn.softmax_cross_entropy_with_logits_v2( logits=out, labels=y )
+		cost = tf.nn.softmax_cross_entropy_with_logits_v2( logits=inference, labels=y )
 		cost = tf.reduce_mean( cost )
 		tf.summary.scalar( 'softmax_cross_entropy', cost )
 
@@ -145,8 +143,8 @@ def train():
 	if FLAGS.finetune and not FLAGS.restore:
 		""" Finetuning """
 		info_msg( "Finetuning {} layers {} ..."
-			.format( FLAGS.net, model_dict["train_layers"] ) )
-		model.load_weights( model_dict["weights"], model_dict["train_layers"], sess)
+			.format( FLAGS.net, cfg.net_dict["train_layers"] ) )
+		model.load_weights( sess )
 		sess.run( tf.global_variables_initializer() )
 		done_msg()
 
@@ -187,6 +185,7 @@ def train():
 
 		if i % iter_batch == 0:
 			epoch = int( i / iter_batch )
+			epochs_done = train_set.epochs_done
 
 			# Show progress 
 			train_loss = sess.run( cost, feed_dict=train_dict )
@@ -197,8 +196,8 @@ def train():
 			summary, val_acc = sess.run( [ merge, accuracy ], feed_dict=val_dict )
 			val_writer.add_summary( summary, epoch )
 
-			msg = "\tEPOCH {0} --Train[Acc:{1:>6.1%}, Loss:{2:.3f}] --Val[Acc:{3:>6.1%}, Loss:{4:.3f}] --Time:{5:.3f} --[{6} / {7}]"
-			watch_msg(msg.format(epoch+1, train_acc, train_loss, val_acc, val_loss, t.time()-start, i, FLAGS.max_iter))
+			msg = "\tEPOCH {0} EPOCHSDONE {1} --Train[Acc:{2:>6.1%}, Loss:{3:.3f}] --Val[Acc:{4:>6.1%}, Loss:{5:.3f}] --Time:{6:.3f} --[{7} / {8}]"
+			watch_msg(msg.format(epoch+1, epochs_done+1, train_acc, train_loss, val_acc, val_loss, t.time()-start, i, FLAGS.max_iter))
 			start = t.time()
 
 			saver.save(sess, FLAGS.model_path+'model-epoch-{}'.format(epoch), write_meta_graph=FLAGS.save_meta)
@@ -207,7 +206,6 @@ def train():
 
 def main(argv=None):
 	if FLAGS.restore == 0:
-
 		if tf.io.gfile.exists(FLAGS.logs_path):
 		 	tf.io.gfile.rmtree(FLAGS.logs_path)
 		tf.io.gfile.makedirs(FLAGS.logs_path)

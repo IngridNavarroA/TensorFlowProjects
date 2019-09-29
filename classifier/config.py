@@ -6,12 +6,12 @@
 import os
 
 class Configuration():
-	def	__init__(self, data_path, stage, network):
+	def	__init__(self, data_path, network, training):
 
 		self.data_path   = data_path
 		self.classes     = os.listdir(self.data_path)
 		self.num_classes = len(self.classes)
-		self.stage       = stage # defines if training or testing
+		self.is_training = training # defines if training or testing
 
 		# Image configuration
 		self.img_scale  = 1.0

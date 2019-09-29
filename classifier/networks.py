@@ -8,11 +8,10 @@ import tensorflow as tf
 import numpy as np
 
 class Alexnet():
-	def __init__(self, nclasses, prob=0.5):
-		self.num_classes = nclasses
-		self.keep_prob = prob
+	def __init__(self, cfg ):
+		self.cfg = cfg
 
-	def load_net(self, x, training=False):
+	def load_net(self, x):
 		conv1 = L.conv('conv1', x=x, fsize=11, nfilters=96, stride=4, padding='SAME') #default padding='SAME'
 		pool1 = L.maxpool('pool1', x=conv1, padding='SAME') # default fsize=3, stride=2
 		norm1 = L.lrn(x=pool1, radius=2, alpha=2e-05, beta=0.75)
@@ -28,21 +27,20 @@ class Alexnet():
 
 		flat  = L.flatten(x=pool5)
 		fc6  = L.fc('fc6', x=flat, noutputs=4096)
-		if training:
-			fc6  = L.dropout(x=fc6, keep_prob=self.keep_prob)
-
+		if self.cfg.is_training:
+			fc6  = L.dropout(x=fc6, keep_prob=self.cfg.dropout_rate)
+		
 		fc7  = L.fc('fc7', x=fc6, noutputs=4096)
-		if training:
-			fc7  = L.dropout(x=fc7, keep_prob=self.keep_prob)
+		if self.cfg.is_training:
+			fc7  = L.dropout(x=fc7, keep_prob=self.cfg.dropout_rate)
 
-		return L.fc('fc8', x=fc7, noutputs=self.num_classes, relu=False)
+		return L.fc('fc8', x=fc7, noutputs=self.cfg.num_classes, relu=False)
 
-	def load_weights(self, weights_path, train_layer, sess):
-		weights = np.load(weights_path, encoding='bytes').item()
+	def load_weights(self, sess):
+		weights = np.load( self.cfg.net_dict[ "weights" ], encoding='bytes').item()
 		for layer in weights:
-
 			# Skip layers that will be trained
-			if layer in train_layer:
+			if layer in self.cfg.net_dict[ "train_layers" ]:
 				continue
 
 			# Load pre-trained weights on layers that won't be trained

@@ -58,19 +58,19 @@ To download images:
 ### Entrenamiento de la red (end-to-end)
 ```
 	workon classifier
-  python classifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 0 --fintune 0
+  python classifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0
 ```
 
 ### Finetunning de la red
 ```
 	workon classifier
-	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 0 --fintune 1
+	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --fintune
 ```
 
 ### Restaurar entrenamiento de la red
 ```
 	workon classifier
-	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore 1
+	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore
 ```
 
 ### Visualización de entrenamiento 

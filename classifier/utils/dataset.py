@@ -34,6 +34,11 @@ class Dataset():
 	@property
 	def cls(self):
 		return self._cls
+
+	@property
+	def epochs_done(self):
+		return self._epochs_done
+	
 	
 	def next_batch(self, batch_size):
 		""" Gets next batch from dataset. """
