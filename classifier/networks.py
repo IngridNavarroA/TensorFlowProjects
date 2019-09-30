@@ -13,18 +13,18 @@ class Alexnet():
 		self.cfg = cfg
 
 	def load_net(self, x):
-		conv1 = L.conv('conv1', x=x, fsize=11, nfilters=96, stride=4, padding='SAME') #default padding='SAME'
-		pool1 = L.maxpool('pool1', x=conv1, padding='SAME') # default fsize=3, stride=2
+		conv1 = L.conv('conv1', x=x, fsize=11, nfilters=96, stride=4, padding='VALID') #default padding='SAME'
+		pool1 = L.maxpool('pool1', x=conv1, padding='VALID') # default fsize=3, stride=2
 		norm1 = L.lrn(x=pool1, radius=2, alpha=2e-05, beta=0.75)
 
 		conv2 = L.conv('conv2', x=norm1, fsize=5, nfilters=256, stride=1, groups=2)
-		pool2 = L.maxpool('pool2', x=conv2, padding='SAME')
+		pool2 = L.maxpool('pool2', x=conv2, padding='VALID')
 		norm2 = L.lrn(x=pool2, radius=2, alpha=2e-05, beta=0.75)
 		
 		conv3 = L.conv('conv3', x=norm2, fsize=3, nfilters=384, stride=1)
 		conv4 = L.conv('conv4', x=conv3, fsize=3, nfilters=384, stride=1, groups=2)
 		conv5 = L.conv('conv5', x=conv4, fsize=3, nfilters=256, stride=1, groups=2)
-		pool5 = L.maxpool('pool5', x=conv5, padding='SAME') 
+		pool5 = L.maxpool('pool5', x=conv5, padding='VALID') 
 
 		flat  = L.flatten(x=pool5)
 		fc6  = L.fc('fc6', x=flat, noutputs=4096)
