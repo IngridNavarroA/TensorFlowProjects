@@ -15,10 +15,10 @@ def err_msg( msg ):
 	exit()
 
 def watch_msg( msg ):
-	print( Color.PINK + "[WATCH] " + msg )
+	print( Color.PINK + "[WATCH] " + msg + Color.WHITE)
 
 def warn_msg( msg ):
-	print( Color.YELLOW + "[WARN] " + msg )
+	print( Color.YELLOW + "[WARN] " + msg + Color.WHITE)
 
 def done_msg(msg=''):
 	print( Color.BLUE + "[DONE] "+ msg + Color.WHITE )

@@ -16,9 +16,7 @@ class Configuration():
 		# Image configuration
 		self.img_scale  = 1.0
 		self.img_depth  = 3
-		self.img_width  = 227
-		self.img_height = 227
-
+		
 		# Training configuration 
 		self.split_size = 0.15
 		self.batch_size = 32
@@ -26,25 +24,33 @@ class Configuration():
 		
 		self.adam_momentum = 0.5
 		self.save_each_n = 20
+		self.img_width  = 224
+		self.img_height = 224
 
 		if network == "alexnet":
-			self.learning_rate = 1e-4
+			self.learning_rate = 1e-2
+			self.img_width  = 227
+			self.img_height = 227
+			self.batch_size = 128
 			self.net_dict      = {
-				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4', 'conv3', 'conv2', 'conv1'],
+				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4'],
 				"meta_file"	   : './pretrained/alexnet/alexnet.meta',
 				"weights"	     : './pretrained/alexnet/alexnet.npy'
 			}
+
+		# This is VGG16
 		elif network == "vgg":
 			self.learning_rate = 1e-4
 			self.net_dict = {
-				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1', 'conv4_3', 'conv4_2', 'conv4_1'],
+				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5_3', 'conv5_2', 'conv5_1'],
 				"meta_file"    : './pretrained/vgg16/vgg16.meta',
 				"weights"	     : './pretrained/vgg16/vgg16_weights.npz'
 			}
 
+		# This is Inception v4
 		elif network == "inception":
-			self.img_width  = 224
-			self.img_height = 224
+			self.img_width  = 299
+			self.img_height = 299
 			self.learning_rate = 1e-4
 			self.net_dict = {
 				"train_layers" : [],

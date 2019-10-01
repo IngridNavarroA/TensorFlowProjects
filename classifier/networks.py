@@ -3,8 +3,8 @@
 	@date:   June 11th, 2019
 	@brief:  Network architectures.
 """
-import layers as L
 import tensorflow as tf
+import layers as L
 import numpy as np
 from utils.logger import watch_msg
 
@@ -13,17 +13,18 @@ class Alexnet():
 		self.cfg = cfg
 
 	def load_net(self, x):
-		conv1 = L.conv('conv1', x=x, fsize=11, nfilters=96, stride=4, padding='VALID') #default padding='SAME'
+		""" Builds model """
+		conv1 = L.conv('conv1', x=x, fsize=[11,11], nfilters=96, stride=4, padding='VALID') #default padding='SAME'
 		pool1 = L.maxpool('pool1', x=conv1, padding='VALID') # default fsize=3, stride=2
 		norm1 = L.lrn(x=pool1, radius=2, alpha=2e-05, beta=0.75)
 
-		conv2 = L.conv('conv2', x=norm1, fsize=5, nfilters=256, stride=1, groups=2)
+		conv2 = L.conv('conv2', x=norm1, fsize=[5,5], nfilters=256, stride=1, groups=2)
 		pool2 = L.maxpool('pool2', x=conv2, padding='VALID')
 		norm2 = L.lrn(x=pool2, radius=2, alpha=2e-05, beta=0.75)
 		
-		conv3 = L.conv('conv3', x=norm2, fsize=3, nfilters=384, stride=1)
-		conv4 = L.conv('conv4', x=conv3, fsize=3, nfilters=384, stride=1, groups=2)
-		conv5 = L.conv('conv5', x=conv4, fsize=3, nfilters=256, stride=1, groups=2)
+		conv3 = L.conv('conv3', x=norm2, fsize=[3,3], nfilters=384, stride=1)
+		conv4 = L.conv('conv4', x=conv3, fsize=[3,3], nfilters=384, stride=1, groups=2)
+		conv5 = L.conv('conv5', x=conv4, fsize=[3,3], nfilters=256, stride=1, groups=2)
 		pool5 = L.maxpool('pool5', x=conv5, padding='VALID') 
 
 		flat  = L.flatten(x=pool5)
@@ -33,11 +34,12 @@ class Alexnet():
 		
 		fc7  = L.fc('fc7', x=fc6, noutputs=4096)
 		if self.cfg.is_training:
-			fc7  = L.dropout(x=fc7, keep_prob=self.cfg.dropout_rate)
+			fc7  = tf.nn.dropout(fc7, rate=1-self.cfg.dropout_rate)
 
 		return L.fc('fc8', x=fc7, noutputs=self.cfg.num_classes, relu=False)
 
 	def load_weights(self, sess):
+		""" Loads weights from specified layers (cfg) from a pre-trained network. """
 		weights = np.load( self.cfg.net_dict[ "weights" ], encoding='bytes').item()
 		for layer in weights:
 			# Skip layers that will be trained
@@ -53,48 +55,54 @@ class Alexnet():
 					else:
 						var = tf.get_variable('weights', trainable=False)
 					sess.run(var.assign(data))
+	
+	def lr_decay(self, lr ):
+		""" Learning rate decay """
+		return np.float32( lr / 10.0 )
 
 class VGG16():
 	def __init__(self, cfg):
 		self.cfg = cfg
 
 	def load_net(self, x):
-		conv1_1 = L.conv('conv1_1', x=x, fsize=3, nfilters=64) #default padding='SAME', stride=1
-		conv1_2 = L.conv('conv1_2', x=conv1_1, fsize=3, nfilters=64)
+		""" Builds model """
+		conv1_1 = L.conv('conv1_1', x=x, fsize=[3,3], nfilters=64) #default padding='SAME', stride=1
+		conv1_2 = L.conv('conv1_2', x=conv1_1, fsize=[3,3], nfilters=64)
 		pool1   = L.maxpool('pool1', x=conv1_2, fsize=2, stride=2)
 
-		conv2_1 = L.conv('conv2_1', x=pool1, fsize=3, nfilters=128)
-		conv2_2 = L.conv('conv2_2', x=conv2_1, fsize=3, nfilters=128)
+		conv2_1 = L.conv('conv2_1', x=pool1, fsize=[3,3], nfilters=128)
+		conv2_2 = L.conv('conv2_2', x=conv2_1, fsize=[3,3], nfilters=128)
 		pool2   = L.maxpool('pool2', x=conv2_2, fsize=2, stride=2)
 
-		conv3_1 = L.conv('conv3_1', x=pool2, fsize=3, nfilters=256)
-		conv3_2 = L.conv('conv3_2', x=conv3_1, fsize=3, nfilters=256)
-		conv3_3 = L.conv('conv3_3', x=conv3_2, fsize=3, nfilters=256)
+		conv3_1 = L.conv('conv3_1', x=pool2, fsize=[3,3], nfilters=256)
+		conv3_2 = L.conv('conv3_2', x=conv3_1, fsize=[3,3], nfilters=256)
+		conv3_3 = L.conv('conv3_3', x=conv3_2, fsize=[3,3], nfilters=256)
 		pool3   = L.maxpool('pool3', x=conv3_3, fsize=2, stride=2)
 		
-		conv4_1 = L.conv('conv4_1', x=pool3, fsize=3, nfilters=512)
-		conv4_2 = L.conv('conv4_2', x=conv4_1, fsize=3, nfilters=512)
-		conv4_3 = L.conv('conv4_3', x=conv4_2, fsize=3, nfilters=512)
+		conv4_1 = L.conv('conv4_1', x=pool3, fsize=[3,3], nfilters=512)
+		conv4_2 = L.conv('conv4_2', x=conv4_1, fsize=[3,3], nfilters=512)
+		conv4_3 = L.conv('conv4_3', x=conv4_2, fsize=[3,3], nfilters=512)
 		pool4   = L.maxpool('pool4', x=conv4_3, fsize=2, stride=2)
 
-		conv5_1 = L.conv('conv5_1', x=pool4, fsize=3, nfilters=512)
-		conv5_2 = L.conv('conv5_2', x=conv5_1, fsize=3, nfilters=512)
-		conv5_3 = L.conv('conv5_3', x=conv5_2, fsize=3, nfilters=512)
+		conv5_1 = L.conv('conv5_1', x=pool4, fsize=[3,3], nfilters=512)
+		conv5_2 = L.conv('conv5_2', x=conv5_1, fsize=[3,3], nfilters=512)
+		conv5_3 = L.conv('conv5_3', x=conv5_2, fsize=[3,3], nfilters=512)
 		pool5   = L.maxpool('pool5', x=conv5_3, fsize=2, stride=2)
 
 		# FIX THIS DESIGN 
 		flat  = L.flatten(x=pool5)
 		fc6   = L.fc('fc6', x=flat, noutputs=4096, binit_val=1.0)
 		if self.cfg.is_training:
-			fc6  = L.dropout(x=fc6, keep_prob=self.cfg.dropout_rate)
+			fc6  = tf.nn.dropout(fc6, rate=1-self.cfg.dropout_rate)
 
 		fc7   = L.fc('fc7', x=fc6, noutputs=4096, binit_val=1.0)
 		if self.cfg.is_training:
-			fc7  = L.dropout(x=fc7, keep_prob=self.cfg.dropout_rate)
+			fc7  = tf.nn.dropout(fc7, rate=1-self.cfg.dropout_rate)
 
 		return L.fc('fc8', x=fc7, noutputs=self.cfg.num_classes, relu=False)
 
 	def load_weights(self, sess):
+		""" Loads weights from specified layers (cfg) from a pre-trained network. """
 		weights = np.load( self.cfg.net_dict[ "weights" ] )
 
 		for i, layer_name in enumerate(weights.keys()):
@@ -112,7 +120,17 @@ class VGG16():
 					var = tf.get_variable('biases', trainable=False)
 				sess.run(var.assign(weights[layer_name]))
 
-class Inception():
+	def lr(self, lr ):
+		return np.float32( lr / 10.0 )
+
+class InceptionV4():
+	def __init__(self, cfg):
+		self.cfg = cfg
+
+	def load_net(self, x):
+		stem = L.stem('stem', x=x)
+
+class InceptionV1():
 	def __init__(self, cfg):
 		self.cfg = cfg
 
@@ -152,7 +170,7 @@ class Inception():
 			conv5_red_size=48, conv5_size=128, pool_proj_size=128)
 		pool5 = L.avgpool('pool5', x=inception5b, fsize=7, stride=1, padding='VALID')
 		if self.cfg.is_training:
-			pool5  = L.dropout(x=pool5, keep_prob=self.cfg.dropout_rate)
+			pool5  = tf.nn.dropout(pool5, rate=1-self.cfg.dropout_rate)
 		flat  = L.flatten(x=pool5)
 		return L.fc('fc4', x=flat, noutputs=self.cfg.num_classes, relu=False)
 

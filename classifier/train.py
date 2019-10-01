@@ -104,7 +104,7 @@ def train():
 		model     = cnn.VGG16( cfg )
 		inference = model.load_net( x )
 	elif FLAGS.net.lower() == 'inception':
-		model     = cnn.Inception( cfg )
+		model     = cnn.InceptionV4( cfg )
 		inference = model.load_net( x )
 
 	done_msg()
@@ -113,6 +113,7 @@ def train():
 	y_cls = tf.argmax( y, axis=1 )
 	y_hat = tf.nn.softmax( inference, name='y_hat' )
 	y_hat_cls = tf.argmax( y_hat, axis=1 )
+	learning_rate = tf.placeholder( tf.float32, [], name='learning_rate' )
 
 	# Get all trainable variables 
 	var_list = [ v for v in tf.trainable_variables() ]
@@ -124,7 +125,7 @@ def train():
 
 	with tf.name_scope('optimizer'):
 		optimizer = tf.train.AdamOptimizer( 
-			cfg.learning_rate ).minimize( cost, var_list = var_list )
+			learning_rate = learning_rate ).minimize( cost, var_list = var_list )
 		
 	with tf.name_scope('accuracy'):
 		correct_pred = tf.cast( tf.equal( y_hat_cls, y_cls ), tf.float32 )
@@ -136,7 +137,7 @@ def train():
 	merge = tf.summary.merge_all()
 	saver = tf.train.Saver( max_to_keep=FLAGS.ckpts_to_keep )
 	
-	curr_iter = 0 
+	curr_iter = 1
 	iter_per_batch = int( train_set.num_examples / cfg.batch_size )
 
 	if FLAGS.finetune and not FLAGS.restore:
@@ -170,11 +171,17 @@ def train():
 	# Training 
 	info_msg( "Starting training..." )
 	start = t.time()
+	lr = cfg.learning_rate
+
 	for i in range( curr_iter, FLAGS.max_iter ):
+
+		if i % 200:
+			# Decay learning rate
+			lr = model.lr( lr )
 
 		# Get next batches
 		train_x, train_y = train_set.next_batch( cfg.batch_size )
-		train_dict = { x: train_x, y: train_y }
+		train_dict = { x: train_x, y: train_y, learning_rate: lr }
 		
 		val_x, val_y = val_set.next_batch( cfg.batch_size )
 		val_dict = { x: val_x, y: val_y }
