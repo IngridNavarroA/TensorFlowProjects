@@ -129,6 +129,14 @@ class InceptionV4():
 
 	def load_net(self, x):
 		stem = L.stem('stem', x=x)
+		# 4 Inception A
+		# Reduction A
+		# 7 Inception B
+		# Reduction B
+		# 3 Inception C
+		# Average Pooling 
+		# Dropout 
+		# Softmax
 
 class InceptionV1():
 	def __init__(self, cfg):
