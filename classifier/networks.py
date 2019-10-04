@@ -18,19 +18,19 @@ class Alexnet():
 		pool1 = md.maxpool('pool1', x=conv1, padding='VALID') # default fsize=3, stride=2
 		norm1 = md.lrn(x=pool1, radius=2, alpha=2e-05, beta=0.75)
 
-		conv2 = md.conv('conv2', x=norm1, fsize=[5,5], nfilters=256, stride=1, groups=2)
+		conv2 = md.conv('conv2', x=norm1, fsize=[5,5], nfilters=256, stride=1)
 		pool2 = md.maxpool('pool2', x=conv2, padding='VALID')
 		norm2 = md.lrn(x=pool2, radius=2, alpha=2e-05, beta=0.75)
 		
 		conv3 = md.conv('conv3', x=norm2, fsize=[3,3], nfilters=384, stride=1)
-		conv4 = md.conv('conv4', x=conv3, fsize=[3,3], nfilters=384, stride=1, groups=2)
-		conv5 = md.conv('conv5', x=conv4, fsize=[3,3], nfilters=256, stride=1, groups=2)
+		conv4 = md.conv('conv4', x=conv3, fsize=[3,3], nfilters=384, stride=1)
+		conv5 = md.conv('conv5', x=conv4, fsize=[3,3], nfilters=256, stride=1)
 		pool5 = md.maxpool('pool5', x=conv5, padding='VALID') 
 
 		flat  = md.flatten(x=pool5)
 		fc6  = md.fc('fc6', x=flat, noutputs=4096)
 		if self.cfg.is_training:
-			fc6  = md.dropout(x=fc6, keep_prob=self.cfg.dropout_rate)
+			fc6  = tf.nn.dropout(fc6, rate=self.cfg.dropout_rate)
 		
 		fc7  = md.fc('fc7', x=fc6, noutputs=4096)
 		if self.cfg.is_training:
@@ -48,7 +48,7 @@ class Alexnet():
 
 			# Load pre-trained weights on layers that won't be trained
 			with tf.compat.v1.variable_scope(layer, reuse=True):
-				watch_msg("\tLoading parameters for layer {}".format(layer))
+				watch_msg("Loading parameters for layer {}".format(layer))
 				for data in weights[layer]:
 					if len(data.shape) == 1:
 						var = tf.get_variable('biases', trainable=False)
@@ -56,7 +56,7 @@ class Alexnet():
 						var = tf.get_variable('weights', trainable=False)
 					sess.run(var.assign(data))
 	
-	def lr_decay(self, lr ):
+	def lr(self, lr ):
 		""" Learning rate decay """
 		return np.float32( lr / 10.0 )
 
@@ -113,7 +113,7 @@ class VGG16():
 				continue
 
 			with tf.variable_scope(layer, reuse=True):
-				watch_msg("\tLoading parameters for layer {}".format(layer))
+				watch_msg("Loading parameters for layer {}".format(layer))
 				if name_split[-1] == 'W':
 					var = tf.get_variable('weights', trainable=False)
 				elif name_split[-1] == 'b':
