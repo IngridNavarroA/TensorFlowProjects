@@ -52,6 +52,7 @@ class Configuration():
 			self.img_width  = 299
 			self.img_height = 299
 			self.learning_rate = 1e-4
+			self.dropout_rate = 0.8
 			self.net_dict = {
 				"train_layers" : [],
 				"meta_file"    : './pretrained/inception/inception.meta',
