@@ -98,20 +98,20 @@ def train():
 
 	info_msg( "Loading architecture {}...".format( FLAGS.net ) )
 	if FLAGS.net.lower() == 'alexnet':
-		model     =  cnn.Alexnet( cfg )
-		inference =  model.load_net( x )
+		model =  cnn.Alexnet( cfg )
+		out   =  model.load_net( x )
 	elif FLAGS.net.lower() == 'vgg':
-		model     = cnn.VGG16( cfg )
-		inference = model.load_net( x )
+		model = cnn.VGG16( cfg )
+		out   = model.load_net( x )
 	elif FLAGS.net.lower() == 'inception':
-		model     = cnn.InceptionV4( cfg )
-		inference = model.load_net( x )
+		model = cnn.InceptionV4( cfg )
+		out   = model.load_net( x )
 
 	done_msg()
 
 	y = tf.placeholder( tf.float32, shape=[None, cfg.num_classes], name='y')
 	y_cls = tf.argmax( y, axis=1 )
-	y_hat = tf.nn.softmax( inference, name='y_hat' )
+	y_hat = tf.nn.softmax( out, name='y_hat' )
 	y_hat_cls = tf.argmax( y_hat, axis=1 )
 	learning_rate = tf.placeholder( tf.float32, [], name='learning_rate' )
 
@@ -119,7 +119,7 @@ def train():
 	var_list = [ v for v in tf.trainable_variables() ]
 
 	with tf.name_scope('loss'):
-		cost = tf.nn.softmax_cross_entropy_with_logits_v2( logits=inference, labels=y )
+		cost = tf.nn.softmax_cross_entropy_with_logits_v2( logits=out, labels=y )
 		cost = tf.reduce_mean( cost )
 		tf.summary.scalar( 'softmax_cross_entropy', cost )
 

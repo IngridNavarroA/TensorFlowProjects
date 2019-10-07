@@ -4,6 +4,12 @@
 	@brief:  This script removes repeated files obtained using the 
 					 google_download.py script.
 """
+"""
+	@author: Ingrid Navarro (navarrs)
+	@date:   September 27th, 2019
+	@brief:  Script to remove repeated files that were obtained from the 
+	         google_download.py script. 
+"""
 import glob 
 import argparse
 import os 
