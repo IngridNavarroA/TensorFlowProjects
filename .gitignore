@@ -2,3 +2,4 @@ logs
 pretrained
 model
 data
+*.txt

@@ -13,36 +13,59 @@ import cv2
 import os 
 
 # Global parameters 
-crop_coords = []
+bbox = []
 cropping = False 
 
-def print_menu():
+def print_menu( f, n ):
 	# Prints option menu 
 	os.system( 'clear' )
 	msg = "Key options:\n \
 	       \tq -- Quit program\n \
+	       \ts -- Save progress\n \
 	       \tb -- Get previous image\n \
 	       \td -- Delete image\n \
 	       \tc -- Crop image\n \
 	       \tr -- Reset cropping region\n \
-	       \tn -- Show next image\n \
-	      "
+	       \tn -- Show next image\n\n \
+	       Processed images {}/{} \
+	      ".format( f, n )
 	print( msg )
+
+def check_coord(x, y, w, h):
+	if x >= w:
+		x = w
+	elif x < 0:
+		x = 0
+
+	if y >= h:
+		y = h
+	elif y < 0:
+		y = 0
+
+	return x, y
 
 def roi_select(event, x, y, flags, param):
 	# Given a click event, store coordinates of clicks and draw a bounding 
 	# box to indicate the Region of Interest in an image 
-	global crop_coords, cropping
+	global bbox, cropping
+
+	height, width = image.shape[:2]
 
 	if event == cv2.EVENT_LBUTTONDOWN:
-		crop_coords = [(x, y)]
+		x, y = check_coord(x, y, width, height)
+		bbox = [(x, y)]
 		cropping = True
 
 	elif event == cv2.EVENT_LBUTTONUP:
-		crop_coords.append((x, y))
+		x, y = check_coord(x, y, width, height)
+		bbox.append((x, y))
 		cropping = False
 
-		cv2.rectangle(image, crop_coords[0], crop_coords[1], (0, 0, 255), 2)
+		# Swap coordinates if they were grabbed from bottom to top
+		if bbox[1][1] < bbox[0][1]:
+			bbox[0], bbox[1] = bbox[1], bbox[0]
+
+		cv2.rectangle(image, bbox[0], bbox[1], (0, 0, 255), 2)
 		cv2.imshow( "Image", image )
 
 if __name__ == '__main__':
@@ -56,8 +79,7 @@ if __name__ == '__main__':
 
 	# Get all files 
 	files = [ f for f in glob.glob( args.inpath + "/*.*", recursive=True ) ]
-	print_menu()
-
+	nfiles = len( files )
 	# Set mouse callback
 	cv2.namedWindow( "Image" )
 	cv2.setMouseCallback( "Image", roi_select )
@@ -75,7 +97,9 @@ if __name__ == '__main__':
 	else:
 		image_index = 0
 
-	while image_index < len( files ):
+	print_menu( image_index, len( files ) )
+	deleted_images = 0
+	while image_index < nfiles:
 		file = files[image_index]
 		image_index += 1
 		
@@ -92,10 +116,15 @@ if __name__ == '__main__':
 			if key == ord( 'q' ):
 				# Write last index read 
 				index_file = open( index_filename, "w" )
-				index_file.write( str( image_index ) )
+				index_file.write( str( image_index - deleted_images ) )
 				index_file.close()
 				print( "Quitting program" )
 				exit( 0 )
+
+			elif key == ord( 's' ):
+				index_file = open( index_filename, "w" )
+				index_file.write( str( image_index - deleted_images ) )
+				index_file.close()
 
 			elif key == ord( 'b' ):
 				# Get previous image
@@ -109,14 +138,16 @@ if __name__ == '__main__':
 			elif key == ord( 'd' ):
 				print( "Removing file {}".format(file) )
 				os.remove( file )
+				nfiles -= 1
+				deleted_images += 1
 				break
 
 			elif key == ord( 'c' ):
 				# Crop image
-				if len(crop_coords) == 2:
+				if len(bbox) == 2:
 					# Get region of interest (roi)
-					roi = copy_img[ crop_coords[0][1]:crop_coords[1][1], 
-					                crop_coords[0][0]:crop_coords[1][0] ]
+					roi = copy_img[ bbox[0][1]:bbox[1][1], 
+					                bbox[0][0]:bbox[1][0] ]
 					cv2.imshow( "RoI", roi )
 					cv2.waitKey(0)
 
@@ -124,7 +155,7 @@ if __name__ == '__main__':
 
 					cv2.imwrite( file, roi )
 					cv2.destroyWindow( "RoI" )
-					print_menu()
+					print_menu( image_index, nfiles )
 					break
 				else:
 					print( "Invalid number of reference points" )
@@ -135,7 +166,7 @@ if __name__ == '__main__':
 
 			elif key == ord('n'):
 				# Break of loop to show next image
-				print_menu()
+				print_menu( image_index, nfiles )
 				break
 
 		# When done, remove index file
