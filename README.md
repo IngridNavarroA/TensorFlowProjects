@@ -46,11 +46,61 @@ Also, I provided a list of requirements, which you can install as follows:
 
 Note: OpenCV is not included in these requirements. I follow this [tutorial](https://www.learnopencv.com/install-opencv3-on-ubuntu/) to install it, except I used version 3.4.
 
-## Utilities
+## Tools
 
-To download images:
+In the tools folder, I provided a set of scripts data preprocessing. Such scripts 
+allow to;
+ - Download images based on Google search queries
+ - Remove repeated files
+ - Rename files
+ - Crop images
+ - Delete images 
+ - Split a dataset into train set and test set
+ - Perform off-line data augmentation
+
+Below, I show usage examples:
+
+#### Download data 
+This script is used to perform an automatic dataset download using the 
+[google-images-download package](https://github.com/hardikvasa/google-images-download ). 
+This script allows to download multiple datasets at a time, by providing a comma separated
+set of keywords. To use it, run:
+
+To use it, run:
 ```
-	python utils/google_download.py --outpath path/to/output/data --keywords add,your,keywords --prefixes prefix --limit 1000 -chrome /path/to/chromedriver
+	python tools/google_download.py --outpath path/to/output/data --keywords kw1,kw2,... --prefixes superhero --limit 20000 --chrome /usr/lib/chromium-browser/chromedriver
+```
+
+#### Pre-process data
+The script pre_process_data.py allows to review a dataset from a given folder. It
+allows to select a region of interest on the image and only keep that region. Also, 
+it allows to delete unnecessary images. To use it run:
+```
+	python tools/pre_process_data.py --inpath path/to/input/data
+```
+The script will show each of the images on the input folder and will allow to 
+perform the following operations on each image:
+
+<p align="center"><img src="./readme/preprocess_ops.png" /> </p>
+
+NOTE: When cropping an image it will look like:
+
+<p align="center"><img src="./readme/crop_sample.png" /> </p>
+
+#### Removed repeated 
+This script is useful when using the google-image-download multiple times for 
+similar queries. The package might download the same image several times but with 
+different indexes. The script will remove the repeated images. To use it, run:
+```
+	python tools/remove_repeated.py --inpath path/to/input/data
+```
+
+#### Rename 
+This script is used to rename all files in an input directory. It uses a basename
+provided by the user and adds current date and hour to the filename to avoid
+overwriting. To use it, run:
+```
+	python tools/rename.py --inpath data/superhero/flash --name flash
 ```
 
 ### Entrenamiento de la red (end-to-end)
