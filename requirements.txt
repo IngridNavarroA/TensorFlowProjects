@@ -9,3 +9,4 @@ Pillow
 tqdm
 tensorflow-gpu
 google_images_download
+Augmentor

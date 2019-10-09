@@ -105,6 +105,7 @@ if __name__ == '__main__':
 		
 		image_name = file.split('/')[-1]
 		image = cv2.imread( file )
+		image = cv2.cvtColor( image, cv2.COLOR_BGR2RGB )
 		copy_img = image.copy()
 		
 		forward = True
@@ -125,6 +126,7 @@ if __name__ == '__main__':
 				index_file = open( index_filename, "w" )
 				index_file.write( str( image_index - deleted_images ) )
 				index_file.close()
+				print( "Saving progress" )
 
 			elif key == ord( 'b' ):
 				# Get previous image
@@ -170,5 +172,5 @@ if __name__ == '__main__':
 				break
 
 		# When done, remove index file
-		if image_index >= len( files ):
+		if image_index >= nfiles:
 			os.remove( index_filename )
