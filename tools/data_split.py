@@ -1,5 +1,5 @@
 """
-	@author: Ingrid Navarro (navarrs)
+	@author: navarrs
 	@date:   September 27th, 2019
 	@brief:  Script to split a dataset into train / test sets. 
 """

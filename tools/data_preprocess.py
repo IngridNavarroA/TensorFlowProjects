@@ -1,5 +1,5 @@
 """
-	@author: Ingrid Navarro (navarrs)
+	@author: navarrs
 	@date:   October 7th, 2019
 	@brief:  This script allows to delete or crop images from a given dataset.
 					 Provide:

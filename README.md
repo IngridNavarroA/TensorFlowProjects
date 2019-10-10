@@ -68,7 +68,7 @@ set of keywords. To use it, run:
 
 To use it, run:
 ```
-	python tools/google_download.py --outpath path/to/output/data --keywords kw1,kw2,... --prefixes superhero --limit 20000 --chrome /usr/lib/chromium-browser/chromedriver
+	python tools/data_gdownload.py --outpath path/to/output/data --keywords kw1,kw2,... --prefixes superhero --limit 20000 --chrome /usr/lib/chromium-browser/chromedriver
 ```
 
 #### Pre-process data
@@ -76,7 +76,7 @@ The script pre_process_data.py allows to review a dataset from a given folder. I
 allows to select a region of interest on the image and only keep that region. Also, 
 it allows to delete unnecessary images. To use it run:
 ```
-	python tools/pre_process_data.py --inpath path/to/input/data
+	python tools/data_preprocess.py --inpath path/to/input/data
 ```
 The script will show each of the images on the input folder and will allow to 
 perform the following operations on each image:
@@ -92,7 +92,7 @@ This script is useful when using the google-image-download multiple times for
 similar queries. The package might download the same image several times but with 
 different indexes. The script will remove the repeated images. To use it, run:
 ```
-	python tools/remove_repeated.py --inpath path/to/input/data
+	python tools/data_rmrepeated.py --inpath path/to/input/data
 ```
 
 #### Rename 
@@ -100,7 +100,7 @@ This script is used to rename all files in an input directory. It uses a basenam
 provided by the user and adds current date and hour to the filename to avoid
 overwriting. To use it, run:
 ```
-	python tools/rename.py --inpath data/superhero/flash --name flash
+	python tools/data_rename.py --inpath data/superhero/flash --name flash
 ```
 
 ### Entrenamiento de la red (end-to-end)
