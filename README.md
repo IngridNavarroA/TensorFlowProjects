@@ -1,6 +1,6 @@
 # Intro to Image Classification with Tensorflow
 
-This is a simple image classifier API to train and test image classification models. 
+Program to build, train and test of image classification models. 
 
 Supported models:
 - AlexNet 
@@ -78,14 +78,6 @@ it allows to delete unnecessary images. To use it run:
 ```
 	python tools/data_preprocess.py --inpath path/to/input/data
 ```
-The script will show each of the images on the input folder and will allow to 
-perform the following operations on each image:
-
-<p align="center"><img src="./readme/preprocess_ops.png" /> </p>
-
-NOTE: When cropping an image it will look like:
-
-<p align="center"><img src="./readme/crop_sample.png" /> </p>
 
 #### Removed repeated 
 This script is useful when using the google-image-download multiple times for 
