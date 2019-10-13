@@ -15,7 +15,7 @@ The API allows to perform end-to-end training, fine-tuning and restoring a train
 
 This code has been implemented / tested / maintained with:
 - OpenCV >= 3.4
-- Python3.6
+- Python 3.6
 - Tensorflow == 1.14.0
 
 Installing a virtual environment using python3 using zsh:

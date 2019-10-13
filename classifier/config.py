@@ -19,21 +19,19 @@ class Configuration():
 		
 		# Training configuration 
 		self.split_size = 0.15
-		self.batch_size = 32
+		self.batch_size = 64
 		self.dropout_rate = 0.5
 		
-		self.adam_momentum = 0.5
 		self.save_each_n = 20
 		self.img_width  = 224
 		self.img_height = 224
 
 		if network == "alexnet":
-			self.learning_rate = 1e-2
+			self.learning_rate = 1e-5
 			self.img_width  = 227
 			self.img_height = 227
-			self.batch_size = 128
 			self.net_dict      = {
-				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5', 'conv4'],
+				"train_layers" : ['fc8', 'fc7', 'fc6', 'conv5' ],
 				"meta_file"	   : './pretrained/alexnet/alexnet.meta',
 				"weights"	     : './pretrained/alexnet/alexnet.npy'
 			}

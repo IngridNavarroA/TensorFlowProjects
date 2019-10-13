@@ -25,25 +25,55 @@ def variable_summary(var):
 		# Visualizing activation distribution
 		tf.summary.histogram('histogram', var)
 
-def conv(name, x, fsize, nfilters, stride=1, padding='SAME', stddev=0.05, binit_val=0.05):
+# def conv(name, x, fsize, nfilters, stride=1, padding='SAME', stddev=0.05, binit_val=0.05):
+# 	""" Wrapper for convolutional layers """
+# 	ninputs = x.get_shape()[-1].value
+
+# 	with tf.variable_scope(name) as scope:
+# 		# Create random weights 
+# 		w_init = tf.random.truncated_normal(shape=[fsize[0], fsize[1], ninputs, nfilters], stddev=stddev, dtype=tf.float32)
+# 		w = tf.get_variable('weights', initializer=w_init, dtype=tf.float32)
+
+# 		# Initialize biases 
+# 		b_init = tf.constant(binit_val, shape=[nfilters], dtype=tf.float32)
+# 		b = tf.get_variable('biases', initializer=b_init, dtype=tf.float32)
+
+# 		layer = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding=padding)
+# 		layer += b
+
+# 		watch_msg("Layer {} has shape {}".format(name, layer.shape))
+# 		return tf.nn.relu(layer, name=scope.name)
+
+def conv(name, x, fsize, nfilters, stride=1, groups=1, padding='SAME', stddev=0.05, binit_val=0.05):
 	""" Wrapper for convolutional layers """
-	ninputs = x.get_shape()[-1].value
+	ninputs = int( x.get_shape()[-1].value / groups ) 
+
+	convolve = lambda i, w: tf.nn.conv2d(i, w, strides=[1, stride, stride, 1], padding=padding)
 
 	with tf.variable_scope(name) as scope:
+
 		# Create random weights 
 		w_init = tf.random.truncated_normal(shape=[fsize[0], fsize[1], ninputs, nfilters], stddev=stddev, dtype=tf.float32)
 		w = tf.get_variable('weights', initializer=w_init, dtype=tf.float32)
 
-		# Initialize biases 
 		b_init = tf.constant(binit_val, shape=[nfilters], dtype=tf.float32)
 		b = tf.get_variable('biases', initializer=b_init, dtype=tf.float32)
 
-		layer = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding=padding)
+		# Convolution 
+		if groups == 1:
+			layer = convolve(x, w)
+		else:
+			x_groups = tf.split(axis=3, num_or_size_splits=groups, value=x)
+			w_groups = tf.split(axis=3, num_or_size_splits=groups, value=w)
+
+			out_groups = [convolve(i, k) for i, k in zip(x_groups, w_groups)]
+			layer = tf.concat(axis=3, values=out_groups)
+
+		# layer = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding=padding)
 		layer += b
 
 		watch_msg("Layer {} has shape {}".format(name, layer.shape))
 		return tf.nn.relu(layer, name=scope.name)
-
 
 def flatten(x):
 	""" Wrapper to convert mutli dimensional tensor into a 

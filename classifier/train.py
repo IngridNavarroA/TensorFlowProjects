@@ -50,11 +50,8 @@ tf.app.flags.DEFINE_boolean( 'restore', False,
 														 """Train from checkpoint (True).""" )
 tf.app.flags.DEFINE_boolean( 'save_meta', False, 
 	                           """Save metafiles (True). """ )
-
-def get_current_iteration( epoch, iter_per_batch ):
-	""" If restoring a model, return the last iteration. """
-	return epoch * iter_batch 
-
+tf.app.flags.DEFINE_boolean( 'decay_lr', False, 
+	                           """Decay learning rate while training (True). """ )
 
 def train():
 	""" Training algorithm. """
@@ -153,14 +150,13 @@ def train():
 		info_msg( "Loading checkpoint for {} network from {} ..."
 			.format( FLAGS.net, FLAGS.model_path ) )
 		try:
-			saver = tf.train.import_meta_graph( model_dict["meta_file"] )
-			checkpoint = tf.train.get_checkpoint_state( FLAGS.model_path )
-			checkpoint = checkpoint.model_checkpoint_path
+			saver = tf.train.import_meta_graph( cfg.net_dict[ "meta_file" ] )		
+			checkpoint = tf.train.latest_checkpoint( FLAGS.model_path )
 			saver.restore( sess, checkpoint )
 			sess.run( tf.global_variables() )
 
 			# Get current iteration from restored model 
-			curr_iter = get_current_iteration( int( checkpoint.split('-')[-1]), iter_batch )
+			curr_iter = int( checkpoint.split('-')[-1]) * iter_per_batch 
 		except:
 			err_msg("Could not load checkpoint.")
 	else: 
@@ -175,7 +171,7 @@ def train():
 
 	for i in range( curr_iter, FLAGS.max_iter ):
 
-		if i % 200:
+		if i % 1000 and FLAGS.decay_lr:
 			# Decay learning rate
 			lr = model.lr( lr )
 

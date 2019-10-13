@@ -18,12 +18,12 @@ class Alexnet():
 		pool1 = md.maxpool('pool1', x=conv1, padding='VALID') # default fsize=3, stride=2
 		norm1 = md.lrn(x=pool1, radius=2, alpha=2e-05, beta=0.75)
 
-		conv2 = md.conv('conv2', x=norm1, fsize=[5,5], nfilters=256, stride=1)
+		conv2 = md.conv('conv2', x=norm1, fsize=[5,5], nfilters=256, stride=1, groups=2)
 		pool2 = md.maxpool('pool2', x=conv2, padding='VALID')
 		norm2 = md.lrn(x=pool2, radius=2, alpha=2e-05, beta=0.75)
 		
 		conv3 = md.conv('conv3', x=norm2, fsize=[3,3], nfilters=384, stride=1)
-		conv4 = md.conv('conv4', x=conv3, fsize=[3,3], nfilters=384, stride=1)
+		conv4 = md.conv('conv4', x=conv3, fsize=[3,3], nfilters=384, stride=1, groups=2)
 		conv5 = md.conv('conv5', x=conv4, fsize=[3,3], nfilters=256, stride=1)
 		pool5 = md.maxpool('pool5', x=conv5, padding='VALID') 
 
