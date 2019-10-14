@@ -95,34 +95,34 @@ overwriting. To use it, run:
 	python tools/data_rename.py --inpath data/superhero/flash --name flash
 ```
 
-### Entrenamiento de la red (end-to-end)
+## Training 
+This code supports different types of training:
+ - End-to-end training
+ - Finetuning from pre-trained model
+ - Restoring a training model 
+
+## End-to-end training 
 ```
 	workon classifier
   python classifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0
 ```
 
-### Finetunning de la red
+### Finetune
 ```
 	workon classifier
-	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --fintune
+	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --finetune
 ```
 
-### Restaurar entrenamiento de la red
+### Restore
 ```
 	workon classifier
-	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore
+	python clasifier/train.py --data path/to/training/data --max_iter 20000 --gpu 0 --restore --model_path path/to/model/to/restore
 ```
 
-### Visualización de entrenamiento 
+## Visualize training in Tensorboard
 ```
 	workon classifier
-	tensorboard --logdir=log
-```
-
-### Prueba de modelo entrenado
-```
-	workon tf-classifier
-	python src/test.py --data path/to/testing/data --meta path/to/model
+	tensorboard --logdir=/path/to/logs
 ```
 
 Al abrir en la dirección de loopback (e.g. http://127.0.1.1:6006) indicada por TensorBoard, se observarán gráficas como las siguientes:
@@ -135,3 +135,19 @@ Al abrir en la dirección de loopback (e.g. http://127.0.1.1:6006) indicada por 
 
 ## Arquitectura actual del clasificador
 <p align="center"><img src="./readme/alexnet.png" /> </p>
+
+### Test the models
+To test and visualize predictions:
+```
+	workon classifier
+	python classifier/test.py --data path/to/testing/data --model_path path/to/test/model --watch 1
+```
+And you'll see predictions like:
+<p align="center"><img src="./readme/cat_pred.png" /> </p>
+<p align="center"><img src="./readme/dog_pred.png" /> </p>
+
+To test and only see accuracy metrics
+```
+	workon classifier
+	python classifier/test.py --data path/to/testing/data --model_path path/to/test/model
+```
