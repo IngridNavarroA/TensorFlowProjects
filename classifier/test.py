@@ -128,8 +128,9 @@ def test():
 				continue
 
 	info_msg(""" Computing statistics. """)
-	prec, rec, fscore, _ = precision_recall_fscore_support(y_truth, y_predicted, labels=[0,1])
-	for i, clss in enumerate(cfg.CLASSES):
+	prec, rec, fscore, _ = precision_recall_fscore_support( 
+																						y_truth, y_predicted, labels=[0,1] )
+	for i, clss in enumerate( cfg.classes ):
 		print("Class -- {}".format(clss))
 		print("\tPrecission = {}".format(prec[i]))
 		print("\tRecall = {}".format(rec[i]))
